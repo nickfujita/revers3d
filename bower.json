@@ -4,7 +4,6 @@
     "Stephen Wu <stefan.wu@gmail.com>"
   ],
   "description": "Play othello/reversi. With a friend. In 3d. In VR.",
-  "directory": "app/bower_components",
   "main": "",
   "moduleType": [
     "es6",
