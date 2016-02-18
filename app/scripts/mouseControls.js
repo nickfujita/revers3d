@@ -111,8 +111,14 @@ var canJump = false;
 var prevTime = performance.now();
 var velocity = new THREE.Vector3();
 
-var spotLight, pieceGeometry;
-var fTileGeometry, rTileGeometry, tTileGeometry;
+var spotLight;
+var pieceGeometry = new THREE.IcosahedronGeometry(.4, 0);
+
+var faces = [];
+
+var xyFace, yzFace, xzFace; // Faces along given axes
+var pxEdge, nxEdge, pyEdge, nyEdge, pzEdge, nzEdge; // +/- sloped edges along axis
+var pppCor, ppnCor, pnpCor, pnnCor, nppCor, npnCor, nnpCor, nnnCor; // +/- x, y, z Corners
 
 function init() {
 
@@ -193,8 +199,8 @@ function init() {
 
   };
 
-  // document.addEventListener( 'keydown', onKeyDown, false );
-  // document.addEventListener( 'keyup', onKeyUp, false );
+  document.addEventListener( 'keydown', onKeyDown, false );
+  document.addEventListener( 'keyup', onKeyUp, false );
 
   raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
 
@@ -225,116 +231,132 @@ function init() {
   // mesh = new THREE.Mesh( geometry, material );
   // scene.add( mesh );
 
-  // board
-  fTileGeometry = new THREE.BoxGeometry( 19, 19, 1 );
-  rTileGeometry = fTileGeometry.clone().rotateY( - Math.PI / 2 );
-  tTileGeometry = fTileGeometry.clone().rotateX( - Math.PI / 2 );
+  /*
+  ========================================
+      Game Surfaces
+  ========================================
+   */
+  var faces = {};
+  var edges = {};
+  var corners = {};
 
-  pieceGeometry = new THREE.IcosahedronGeometry(.4, 0);
+  var xyFace, yzFace, xzFace; // Faces along given axes
+  var pxEdge, nxEdge, pyEdge, nyEdge, pzEdge, nzEdge; // +/- sloped edges along axis
+  var pppCor, ppnCor, pnpCor, pnnCor, nppCor, npnCor, nnpCor, nnnCor; // +/- x, y, z Corners
 
-  var material = new THREE.MeshLambertMaterial({ color: 0x999999 });
+  var edgeLength = 20 * Math.sin( Math.PI / 4 );
+  var radius = edgeLength + 20;
 
-  var board = [];
-  for(var i = 0; i < 4; i++) {
-    board[i] = [];
-    for(var j = 0; j < 4; j++) {
-      board[i][j] = new THREE.Mesh( fTileGeometry, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
-      board[i][j].position.x = (i) * 20 - 30;
-      board[i][j].position.y = (j) * 20 - 30;
-      board[i][j].position.z = -40.5;
+  // Face geometry definitions
+  xyFace = new THREE.BoxGeometry( 19, 19, 1 );
+  yzFace = xyFace.clone().rotateY( - Math.PI / 2 );
+  xzFace = xyFace.clone().rotateX( - Math.PI / 2 );
 
-      scene.add( board[i][j] );
+  // Edge geometry definitions
+  pxEdge = xyFace.clone().rotateY( - Math.PI / 4 );
+  pyEdge = yzFace.clone().rotateZ( - Math.PI / 4 );
+  pzEdge = xyFace.clone().rotateX( - Math.PI / 4 );
+  nxEdge = xyFace.clone().rotateY( Math.PI / 4 );
+  nyEdge = yzFace.clone().rotateZ( Math.PI / 4 );
+  nzEdge = xyFace.clone().rotateX( Math.PI / 4) ;
+
+  var test = new THREE.Mesh( pxEdge, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
+  test.position.x = radius - 0.5 * edgeLength;
+  test.position.y = 10;
+  test.position.z = -1 * radius + 0.5 * edgeLength;
+
+  scene.add(test)
+
+  var test2 = new THREE.Mesh( nxEdge, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
+  test2.position.x = -1 * radius + 0.5 * edgeLength;
+  test2.position.y = 10;
+  test2.position.z = -1 * radius + 0.5 * edgeLength;
+
+  scene.add(test2)
+
+  // Corner geometry definitions
+  pppCor, ppnCor, pnpCor, pnnCor, nppCor, npnCor, nnpCor, nnnCor; // +/- x, y, z Corners
+
+  // Place faces
+  for(var x = -10; x <= 10; x += 20) {
+    faces[x] = {};
+    for(var y = -10; y <= 10; y += 20) {
+      faces[x][y] = {};
+      for(var z = -1 * radius; z <= radius; z += 2 * radius) {
+        faces[x][y][z] = new THREE.Mesh( xyFace, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
+        faces[x][y][z].position.x = x;
+        faces[x][y][z].position.y = y;
+        faces[x][y][z].position.z = z;
+
+        scene.add( faces[x][y][z] );
+      }
     }
   }
 
-  for(var i = 0; i < 4; i++) {
-    board[i] = [];
-    for(var j = 0; j < 4; j++) {
-      board[i][j] = new THREE.Mesh( rTileGeometry, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
-      board[i][j].position.x = 40.5;
-      board[i][j].position.y = (i) * 20 - 30;
-      board[i][j].position.z = (j) * 20 - 30;
+  for(var i = 0; i < 2; i++) {
+    faces[i] = [];
+    for(var j = 0; j < 2; j++) {
+      faces[i][j] = new THREE.Mesh( yzFace, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
+      faces[i][j].position.x = radius;
+      faces[i][j].position.y = (i) * 20 - 10;
+      faces[i][j].position.z = (j) * 20 - 10;
 
-      scene.add( board[i][j] );
+      scene.add( faces[i][j] );
     }
   }
 
-  for(var i = 0; i < 4; i++) {
-    board[i] = [];
-    for(var j = 0; j < 4; j++) {
-      board[i][j] = new THREE.Mesh( fTileGeometry, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
-      board[i][j].position.x = (j) * 20 - 30;
-      board[i][j].position.y = (i) * 20 - 30;
-      board[i][j].position.z = 40.5;
-
-      scene.add( board[i][j] );
-    }
-  }
-
-  for(var i = 0; i < 4; i++) {
-    board[i] = [];
-    for(var j = 0; j < 4; j++) {
-      board[i][j] = new THREE.Mesh( rTileGeometry, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
-      board[i][j].position.x = -40.5;
-      board[i][j].position.y = (i) * 20 - 30;
-      board[i][j].position.z = (j) * 20 - 30;
-
-      scene.add( board[i][j] );
-    }
-  }
-
-  for(var i = 0; i < 4; i++) {
-    board[i] = [];
-    for(var j = 0; j < 4; j++) {
-      board[i][j] = new THREE.Mesh( tTileGeometry, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
-      board[i][j].position.x = (i) * 20 - 30;
-      board[i][j].position.y = -40.5;
-      board[i][j].position.z = (j) * 20 - 30;
-
-      scene.add( board[i][j] );
-    }
-  }
-
-  for(var i = 0; i < 4; i++) {
-    board[i] = [];
-    for(var j = 0; j < 4; j++) {
-      board[i][j] = new THREE.Mesh( tTileGeometry, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
-      board[i][j].position.x = (i) * 20 - 30;
-      board[i][j].position.y = 40.5;
-      board[i][j].position.z = (j) * 20 - 30;
-
-      scene.add( board[i][j] );
-    }
-  }
-
-  // 3d board
-  // function face() {
-
-  // }
-
-  // for(var i = 0; i < 3; i++) {
+  // for(var i = 0; i < 2; i++) {
+  //   faces[i] = [];
   //   for(var j = 0; j < 2; j++) {
-  //     for(var k = 0; k < 2; k++) {
+  //     faces[i][j] = new THREE.Mesh( xyFace, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
+  //     faces[i][j].position.x = (j) * 20 - 10;
+  //     faces[i][j].position.y = (i) * 20 - 10;
+  //     faces[i][j].position.z = radius;
 
-  //     }
+  //     scene.add( faces[i][j] );
   //   }
   // }
 
-  // for(var i = 0; i < 4; i++) {
-  //   board[i] = [];
-  //   for(var j = 0; i < 2; j++) {
-  //     board[i][j] = [];
-  //     for(var k = 0; k < 2; k++) {
-  //       board[i][j][k] = new THREE.Mesh( fTileGeometry, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
-  //       board[i][j][k].position.x = i - 3.5;
-  //       board[i][j][k].position.y = j - 3.5;
-  //       board[i][j][k].position.z = -10;
+  for(var i = 0; i < 2; i++) {
+    faces[i] = [];
+    for(var j = 0; j < 2; j++) {
+      faces[i][j] = new THREE.Mesh( yzFace, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
+      faces[i][j].position.x = -1 * radius;
+      faces[i][j].position.y = (i) * 20 - 10;
+      faces[i][j].position.z = (j) * 20 - 10;
 
-  //       scene.add( board[i][j][k] );
-  //     }
-  //   }
-  //   fTileGeometry.rotateX( - Math.PI / 2 );
-  // }
+      scene.add( faces[i][j] );
+    }
+  }
+
+  for(var i = 0; i < 2; i++) {
+    faces[i] = [];
+    for(var j = 0; j < 2; j++) {
+      faces[i][j] = new THREE.Mesh( xzFace, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
+      faces[i][j].position.x = (i) * 20 - 10;
+      faces[i][j].position.y = -1 * radius;
+      faces[i][j].position.z = (j) * 20 - 10;
+
+      scene.add( faces[i][j] );
+    }
+  }
+
+  for(var i = 0; i < 2; i++) {
+    faces[i] = [];
+    for(var j = 0; j < 2; j++) {
+      faces[i][j] = new THREE.Mesh( xzFace, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
+      faces[i][j].position.x = (i) * 20 - 10;
+      faces[i][j].position.y = radius;
+      faces[i][j].position.z = (j) * 20 - 10;
+
+      scene.add( faces[i][j] );
+    }
+  }
+
+  // Place edges
+  for(var i = 0; i < 2; i++) {
+
+  }
 
   // geometry = new THREE.BoxGeometry( 20, 20, 20 );
 
@@ -392,50 +414,50 @@ function animate() {
 
   requestAnimationFrame( animate );
 
-  // if ( controlsEnabled ) {
-  //   raycaster.ray.origin.copy( controls.getObject().position );
-  //   raycaster.ray.origin.y -= 10;
+  if ( controlsEnabled ) {
+    raycaster.ray.origin.copy( controls.getObject().position );
+    raycaster.ray.origin.y -= 10;
 
-  //   var intersections = raycaster.intersectObjects( objects );
+    var intersections = raycaster.intersectObjects( objects );
 
-  //   var isOnObject = intersections.length > 0;
+    var isOnObject = intersections.length > 0;
 
-  //   var time = performance.now();
-  //   var delta = ( time - prevTime ) / 1000;
+    var time = performance.now();
+    var delta = ( time - prevTime ) / 1000;
 
-  //   velocity.x -= velocity.x * 10.0 * delta;
-  //   velocity.z -= velocity.z * 10.0 * delta;
+    velocity.x -= velocity.x * 10.0 * delta;
+    velocity.z -= velocity.z * 10.0 * delta;
 
-  //   velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+    // velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
 
-  //   if ( moveForward ) velocity.z -= 400.0 * delta;
-  //   if ( moveBackward ) velocity.z += 400.0 * delta;
+    if ( moveForward ) velocity.z -= 400.0 * delta;
+    if ( moveBackward ) velocity.z += 400.0 * delta;
 
-  //   if ( moveLeft ) velocity.x -= 400.0 * delta;
-  //   if ( moveRight ) velocity.x += 400.0 * delta;
+    if ( moveLeft ) velocity.x -= 400.0 * delta;
+    if ( moveRight ) velocity.x += 400.0 * delta;
 
-  //   if ( isOnObject === true ) {
-  //     velocity.y = Math.max( 0, velocity.y );
+    // if ( isOnObject === true ) {
+    //   velocity.y = Math.max( 0, velocity.y );
 
-  //     canJump = true;
-  //   }
+    //   canJump = true;
+    // }
 
-  //   controls.getObject().translateX( velocity.x * delta );
-  //   controls.getObject().translateY( velocity.y * delta );
-  //   controls.getObject().translateZ( velocity.z * delta );
+    controls.getObject().translateX( velocity.x * delta );
+    // controls.getObject().translateY( velocity.y * delta );
+    controls.getObject().translateZ( velocity.z * delta );
 
-  //   if ( controls.getObject().position.y < 10 ) {
+    // if ( controls.getObject().position.y < 10 ) {
 
-  //     velocity.y = 0;
-  //     controls.getObject().position.y = 10;
+    //   velocity.y = 0;
+    //   controls.getObject().position.y = 10;
 
-  //     canJump = true;
+    //   canJump = true;
 
-  //   }
+    // }
 
-  //   prevTime = time;
+    prevTime = time;
 
-  // }
+  }
 
   var raycaster2 = new THREE.Raycaster();
   var mouse = new THREE.Vector2();
@@ -463,7 +485,7 @@ function animate() {
       // document.body.style.cursor = 'crosshair';
       // Restore previous properties of intersection
       if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-      // INTERSECTED.geometry = fTileGeometry;
+      // INTERSECTED.geometry = xyFace;
       INTERSECTED = null;
     }
   }
