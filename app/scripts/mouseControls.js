@@ -236,8 +236,6 @@ function init() {
       Game Surfaces
   ========================================
    */
-  var faces = {};
-  var edges = {};
   var corners = {};
 
   var xyFace, yzFace, xzFace; // Faces along given axes
@@ -260,30 +258,19 @@ function init() {
   nyEdge = yzFace.clone().rotateZ( Math.PI / 4 );
   nzEdge = xyFace.clone().rotateX( Math.PI / 4) ;
 
-  var test = new THREE.Mesh( pxEdge, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
-  test.position.x = radius - 0.5 * edgeLength;
-  test.position.y = 10;
-  test.position.z = -1 * radius + 0.5 * edgeLength;
-
-  scene.add(test)
-
-  var test2 = new THREE.Mesh( nxEdge, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
-  test2.position.x = -1 * radius + 0.5 * edgeLength;
-  test2.position.y = 10;
-  test2.position.z = -1 * radius + 0.5 * edgeLength;
-
-  scene.add(test2)
-
   // Corner geometry definitions
   pppCor, ppnCor, pnpCor, pnnCor, nppCor, npnCor, nnpCor, nnnCor; // +/- x, y, z Corners
 
   // Place faces
-  for(var x = -10; x <= 10; x += 20) {
+  var faces = {};
+
+  for(var x = -1 * radius; x <= radius; x += 2 * radius) {
     faces[x] = {};
     for(var y = -10; y <= 10; y += 20) {
       faces[x][y] = {};
-      for(var z = -1 * radius; z <= radius; z += 2 * radius) {
-        faces[x][y][z] = new THREE.Mesh( xyFace, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
+      for(var z = -10; z <= 10; z += 20) {
+        faces[x][y][z] = new THREE.Mesh( yzFace, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
+
         faces[x][y][z].position.x = x;
         faces[x][y][z].position.y = y;
         faces[x][y][z].position.z = z;
@@ -293,70 +280,138 @@ function init() {
     }
   }
 
-  for(var i = 0; i < 2; i++) {
-    faces[i] = [];
-    for(var j = 0; j < 2; j++) {
-      faces[i][j] = new THREE.Mesh( yzFace, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
-      faces[i][j].position.x = radius;
-      faces[i][j].position.y = (i) * 20 - 10;
-      faces[i][j].position.z = (j) * 20 - 10;
+  for(var x = -10; x <= 10; x += 20) {
+    faces[x] = {};
+    for(var y = -1 * radius; y <= radius; y += 2 * radius) {
+      faces[x][y] = {};
+      for(var z = -10; z <= 10; z += 20) {
+        faces[x][y][z] = new THREE.Mesh( xzFace, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
 
-      scene.add( faces[i][j] );
+        faces[x][y][z].position.x = x;
+        faces[x][y][z].position.y = y;
+        faces[x][y][z].position.z = z;
+
+        scene.add( faces[x][y][z] );
+      }
     }
   }
 
-  // for(var i = 0; i < 2; i++) {
-  //   faces[i] = [];
-  //   for(var j = 0; j < 2; j++) {
-  //     faces[i][j] = new THREE.Mesh( xyFace, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
-  //     faces[i][j].position.x = (j) * 20 - 10;
-  //     faces[i][j].position.y = (i) * 20 - 10;
-  //     faces[i][j].position.z = radius;
+  for(var x = -10; x <= 10; x += 20) {
+    faces[x] = {};
+    for(var y = -10; y <= 10; y += 20) {
+      faces[x][y] = {};
+      for(var z = -1 * radius; z <= radius; z += 2 * radius) {
+        faces[x][y][z] = new THREE.Mesh( xyFace, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
 
-  //     scene.add( faces[i][j] );
-  //   }
-  // }
+        faces[x][y][z].position.x = x;
+        faces[x][y][z].position.y = y;
+        faces[x][y][z].position.z = z;
 
-  for(var i = 0; i < 2; i++) {
-    faces[i] = [];
-    for(var j = 0; j < 2; j++) {
-      faces[i][j] = new THREE.Mesh( yzFace, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
-      faces[i][j].position.x = -1 * radius;
-      faces[i][j].position.y = (i) * 20 - 10;
-      faces[i][j].position.z = (j) * 20 - 10;
-
-      scene.add( faces[i][j] );
-    }
-  }
-
-  for(var i = 0; i < 2; i++) {
-    faces[i] = [];
-    for(var j = 0; j < 2; j++) {
-      faces[i][j] = new THREE.Mesh( xzFace, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
-      faces[i][j].position.x = (i) * 20 - 10;
-      faces[i][j].position.y = -1 * radius;
-      faces[i][j].position.z = (j) * 20 - 10;
-
-      scene.add( faces[i][j] );
-    }
-  }
-
-  for(var i = 0; i < 2; i++) {
-    faces[i] = [];
-    for(var j = 0; j < 2; j++) {
-      faces[i][j] = new THREE.Mesh( xzFace, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
-      faces[i][j].position.x = (i) * 20 - 10;
-      faces[i][j].position.y = radius;
-      faces[i][j].position.z = (j) * 20 - 10;
-
-      scene.add( faces[i][j] );
+        scene.add( faces[x][y][z] );
+      }
     }
   }
 
   // Place edges
-  for(var i = 0; i < 2; i++) {
+  var edges = {};
 
+  for(var x = -20 - 0.5 * edgeLength; x <= 20 + 0.5 * edgeLength; x += 2 * (20 + 0.5 * edgeLength)) {
+    for(var y = -10; y <= 10; y += 20) {
+      var z = -x;
+      edges[x] = {};
+      edges[x][y] = {};
+
+      edges[x][y][z] = new THREE.Mesh( pxEdge, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
+
+      edges[x][y][z].position.x = x;
+      edges[x][y][z].position.y = y;
+      edges[x][y][z].position.z = z;
+
+      scene.add( edges[x][y][z] );
+    }
   }
+
+  for(var x = -20 - 0.5 * edgeLength; x <= 20 + 0.5 * edgeLength; x += 2 * (20 + 0.5 * edgeLength)) {
+    for(var y = -10; y <= 10; y += 20) {
+      var z = x;
+      edges[x] = {};
+      edges[x][y] = {};
+
+      edges[x][y][z] = new THREE.Mesh( nxEdge, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
+
+      edges[x][y][z].position.x = x;
+      edges[x][y][z].position.y = y;
+      edges[x][y][z].position.z = z;
+
+      scene.add( edges[x][y][z] );
+    }
+  }
+
+  for(var x = -10; x <= 10; x += 20) {
+    for(var y = -20 - 0.5 * edgeLength; y <= 20 + 0.5 * edgeLength; y += 2 * (20 + 0.5 * edgeLength)) {
+      var z = -y;
+      edges[x] = {};
+      edges[x][y] = {};
+
+      edges[x][y][z] = new THREE.Mesh( nzEdge, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
+
+      edges[x][y][z].position.x = x;
+      edges[x][y][z].position.y = y;
+      edges[x][y][z].position.z = z;
+
+      scene.add( edges[x][y][z] );
+    }
+  }
+
+  for(var x = -10; x <= 10; x += 20) {
+    for(var y = -20 - 0.5 * edgeLength; y <= 20 + 0.5 * edgeLength; y += 2 * (20 + 0.5 * edgeLength)) {
+      var z = y;
+      edges[x] = {};
+      edges[x][y] = {};
+
+      edges[x][y][z] = new THREE.Mesh( pzEdge, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
+
+      edges[x][y][z].position.x = x;
+      edges[x][y][z].position.y = y;
+      edges[x][y][z].position.z = z;
+
+      scene.add( edges[x][y][z] );
+    }
+  }
+
+  for(var y = -20 - 0.5 * edgeLength; y <= 20 + 0.5 * edgeLength; y += 2 * (20 + 0.5 * edgeLength)) {
+    for(var z = -10; z <= 10; z += 20) {
+      var x = y;
+      edges[x] = {};
+      edges[x][y] = {};
+
+      edges[x][y][z] = new THREE.Mesh( nyEdge, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
+
+      edges[x][y][z].position.x = x;
+      edges[x][y][z].position.y = y;
+      edges[x][y][z].position.z = z;
+
+      scene.add( edges[x][y][z] );
+    }
+  }
+
+  for(var y = -20 - 0.5 * edgeLength; y <= 20 + 0.5 * edgeLength; y += 2 * (20 + 0.5 * edgeLength)) {
+    for(var z = -10; z <= 10; z += 20) {
+      var x = -y;
+      edges[x] = {};
+      edges[x][y] = {};
+
+      edges[x][y][z] = new THREE.Mesh( pyEdge, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
+
+      edges[x][y][z].position.x = x;
+      edges[x][y][z].position.y = y;
+      edges[x][y][z].position.z = z;
+
+      scene.add( edges[x][y][z] );
+    }
+  }
+
+
 
   // geometry = new THREE.BoxGeometry( 20, 20, 20 );
 
