@@ -411,6 +411,39 @@ function init() {
     }
   }
 
+  // var normal = new THREE.Vector3( 0, 1, 0 );
+  // var color = new THREE.Color( 0xffaa00 );
+  // var face = new THREE.Face3( 0, 1, 2, normal, color, 0 );
+
+  // scene.add(face);
+
+  // var triangle = new THREE.Geometry();
+
+  // triangle.vertices.push(
+  //   new THREE.Vector3( -10,  10, 0 ),
+  //   new THREE.Vector3( -10, -10, 0 ),
+  //   new THREE.Vector3(  10, -10, 0 )
+  // );
+
+  // triangle.faces.push( new THREE.Face3( 0, 1, 2 ) );
+
+  // triangle.computeBoundingSphere();
+
+  var geometry = new THREE.Geometry();
+
+  geometry.vertices.push(
+    new THREE.Vector3( -10,  10, 0 ),
+    new THREE.Vector3( -10, -10, 0 ),
+    new THREE.Vector3(  10, -10, 0 )
+  );
+
+  geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
+
+  geometry.computeBoundingSphere();
+
+  var asdf = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial({ color: 0x999999 }) );
+
+  scene.add(asdf);
 
 
   // geometry = new THREE.BoxGeometry( 20, 20, 20 );
