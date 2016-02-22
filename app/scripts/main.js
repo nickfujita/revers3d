@@ -1,225 +1,166 @@
-/*
-========================================
-    Scene setup
-========================================
- */
-var scene = new THREE.Scene();
+(function() {
+  /*
+  ========================================
+      Scene Setup
+  ========================================
+   */
+  window.scene = new THREE.Scene();
+  scene.fog = new THREE.Fog( 0xffffff, 0, 750 );
 
-// Lights
-var light = new THREE.PointLight( 0xffffff, 4, 100 );
-light.position.set( 0, 10, 90 );
-scene.add( light );
+  var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
-// var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-// directionalLight.position.set( camera.position.x, camera.position.y, camera.position.z );
-// scene.add( directionalLight );
+  var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.75 );
+  light.position.set( 0.5, 1, 0.75 );
+  scene.add( light );
 
-var spotLight = new THREE.SpotLight( 0xff0066 );
+  window.controls = new THREE.PointerLockControls( camera );
+  scene.add( controls.getObject() );
 
-// console.log(camera.position.x, camera.position.y, camera.position.z);
-
-spotLight.position.set( 0, 0, 5 );
-
-spotLight.castShadow = true;
-
-// spotLight.shadowMapWidth = 1024;
-// spotLight.shadowMapHeight = 1024;
-
-// spotLight.shadowCameraNear = 500;
-// spotLight.shadowCameraFar = 4000;
-// spotLight.shadowCameraFov = 30;
-
-scene.add( spotLight );
-
-// Camera
-var camera = new THREE.PerspectiveCamera( 100, window.innerWidth / window.innerHeight, 0.5, 500 );
-// var height = 100, width = 100;
-// var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
-
-camera.position.z = 5;
-
-var renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
-
-/*
-========================================
-    Board Setup
-========================================
- */
-
-
-var geometry = new THREE.BoxGeometry( 0.8, 0.8, .1 );
-var pieceGeometry = new THREE.IcosahedronGeometry(.4, 0);
-
-var material = new THREE.MeshLambertMaterial({
-  color: 0x999999
-});
-
-// Initialize board
-var board = [];
-for(var i = 0; i < 8; i++) {
-  board[i] = [];
-  for(var j = 0; j < 8; j++) {
-    board[i][j] = new THREE.Mesh( geometry, material );
-    board[i][j].position.x = i - 3.25;
-    board[i][j].position.y = j - 3.25;
-
-    scene.add( board[i][j] )
-  }
-}
-
-// var cube = new THREE.Mesh( geometry, material );
-// cube.position.x = 1;
-// cube.position.y = 0;
-
-// scene.add( cube )
-
-// var cube2 = new THREE.Mesh( geometry, material );
-// cube2.position.x = 2;
-// cube2.position.y = 0;
-
-// scene.add( cube2 );
-
-
-
-/*
-==============================
-    Window Events
-==============================
- */
-
-window.onresize = function() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
+  var renderer = new THREE.WebGLRenderer();
+  renderer.setClearColor( 0xffffff );
+  renderer.setPixelRatio( window.devicePixelRatio );
   renderer.setSize( window.innerWidth, window.innerHeight );
-  // refreshCube();
-  isPaused = true;
-  setTimeout(function() {
-    isPaused = false;
-  }, 400);
-}
+  document.body.appendChild( renderer.domElement );
 
+  // Register event listeners
+  window.addEventListener( 'resize', onWindowResize, false );
+  document.addEventListener( 'keydown', onKeyDown, false );
+  document.addEventListener( 'keyup', onKeyUp, false );
 
-/*
-========================================
-    Mouse Events
-========================================
- */
+  initBoard();
 
-var raycaster = new THREE.Raycaster();
-var mouse = new THREE.Vector2();
-var INTERSECTED;
+  var prevTime = performance.now();
+  animate();
 
-window.addEventListener( 'mousemove', onMouseMove, false );
-window.addEventListener( 'mousedown', onMouseClick, false );
-window.addEventListener( 'scrolldown', onScrollDown, false );
+  /*
+  ========================================
+      Animation
+  ========================================
+   */
+  var INTERSECTED;
 
-function onMouseMove( event ) {
-  event.preventDefault();
+  var velocity = new THREE.Vector3();
+  var moveForward = false;
+  var moveBackward = false;
+  var moveLeft = false;
+  var moveRight = false;
 
-  // calculate mouse position in normalized device coordinates
-  // (-1 to +1) for both components
+  function animate() {
+    requestAnimationFrame( animate );
 
-  mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-  mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-}
+    if ( controls.enabled ) {
+      var time = performance.now();
+      var delta = ( time - prevTime ) / 1000;
 
-function onMouseClick( event ) {
-  event.preventDefault();
+      velocity.x -= velocity.x * 10.0 * delta;
+      velocity.z -= velocity.z * 10.0 * delta;
 
-  if(INTERSECTED) {
-    // console.log('INTERSECTED:', INTERSECTED);
-  }
-  else  {
-    // console.log('should drag');
-  }
-}
+      if ( moveForward ) velocity.z -= 400.0 * delta;
+      if ( moveBackward ) velocity.z += 400.0 * delta;
 
-function onScrollDown( event ) {
-  // console.log('scrolldown');
+      if ( moveLeft ) velocity.x -= 400.0 * delta;
+      if ( moveRight ) velocity.x += 400.0 * delta;
 
-}
+      controls.getObject().translateX( velocity.x * delta );
+      controls.getObject().translateZ( velocity.z * delta );
 
-/*
-==============================
-    Custom Event Listeners
-==============================
- */
-
-function test() {
-  console.log(scene.getObjectById(1));
-}
-
-
-/*
-==============================
-    Animations
-==============================
- */
-
-
-// function refreshCube() {
-//   if(cube) {
-//     scene.remove(cube);
-//   }
-
-//   geometry = new THREE.BoxGeometry( 1, 1, 1 );
-//   material = new THREE.MeshLambertMaterial({
-//     color: 0xffefd5
-//   });
-//   cube = new THREE.Mesh( geometry, material );
-//   cube.addEventListener('click', function() {
-//     console.log('click');
-//   })
-//   scene.add( cube );
-// }
-
-function render() {
-  // if(!isPaused) {
-  //   cube.rotation.x += 0.01;
-  //   cube.rotation.y += 0.01;
-  // }
-
-  // update the picking ray with the camera and mouse position
-  raycaster.setFromCamera( mouse, camera );
-
-  // calculate objects intersecting the picking ray
-  var intersects = raycaster.intersectObjects( scene.children );
-
-  if ( intersects.length > 0 ) {
-    document.body.style.cursor = 'pointer';
-    if ( INTERSECTED != intersects[ 0 ].object ) {
-      if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-      // Save previous properties of intersected object to restore its properties on blur
-      INTERSECTED = intersects[ 0 ].object;
-      INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-      // INTERSECTED.material.emissive.setHex( 0xff0000 );
-
-      spotLight.target = INTERSECTED;
-      INTERSECTED.geometry = pieceGeometry;
+      prevTime = time;
     }
-  } else {
-    if(INTERSECTED) {
-      document.body.style.cursor = 'crosshair';
-      // Restore previous properties of intersection
-      // if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-      INTERSECTED.geometry = geometry;
-      INTERSECTED = null;
+
+    var sightline = new THREE.Raycaster();
+    var mouse = new THREE.Vector2();
+
+    // update the picking ray with the camera and mouse position
+    sightline.setFromCamera( mouse, camera );
+
+    // calculate board tiles intersecting the picking ray
+    // TODO: change scene.children to board
+    var intersects = sightline.intersectObjects( scene.children );
+
+    if ( intersects.length > 0 ) {
+      if ( INTERSECTED != intersects[ 0 ].object ) {
+        if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+        // Save previous properties of intersected object to restore its properties on blur
+        INTERSECTED = intersects[ 0 ].object;
+        INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+        INTERSECTED.material.emissive.setHex( 0xff0000 );
+
+        // INTERSECTED.geometry = pieceGeometry;
+      }
+    } else {
+      if(INTERSECTED) {
+        // Restore previous properties of intersection
+        if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+        // INTERSECTED.geometry = xyFace;
+        INTERSECTED = null;
+      }
     }
+
+    renderer.render( scene, camera );
   }
 
-  renderer.render( scene, camera );
+  /*
+  ========================================
+      Event Handlers
+  ========================================
+   */
 
-  animationID = requestAnimationFrame( render );
-}
+  function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
 
-/*
-========================================
-    Main
-========================================
- */
-// var animationID, isPaused, geometry, material, cube;
+    renderer.setSize( window.innerWidth, window.innerHeight );
+  }
 
-// refreshCube();
-render();
+  function onKeyDown ( event ) {
+    switch ( event.keyCode ) {
+      case 38: // up
+      case 87: // w
+        moveForward = true;
+        break;
+
+      case 37: // left
+      case 65: // a
+        moveLeft = true; break;
+
+      case 40: // down
+      case 83: // s
+        moveBackward = true;
+        break;
+
+      case 39: // right
+      case 68: // d
+        moveRight = true;
+        break;
+
+      case 32: // space
+        if ( canJump === true ) velocity.y += 350;
+        canJump = false;
+        break;
+    }
+  };
+
+  function onKeyUp ( event ) {
+    switch( event.keyCode ) {
+      case 38: // up
+      case 87: // w
+        moveForward = false;
+        break;
+
+      case 37: // left
+      case 65: // a
+        moveLeft = false;
+        break;
+
+      case 40: // down
+      case 83: // s
+        moveBackward = false;
+        break;
+
+      case 39: // right
+      case 68: // d
+        moveRight = false;
+        break;
+    }
+  };
+})();
