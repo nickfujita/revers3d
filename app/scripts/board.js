@@ -14,7 +14,7 @@ function initBoard() {
   var EDGE_LENGTH = TILE_WIDTH * Math.sin( Math.PI / 4 );
   var RADIUS = TILE_WIDTH + EDGE_LENGTH;
 
-  var material = { color: 0x999999/*, wireframe: true,*/ };
+  var material = { color: window.board.color/*, wireframe: true,*/ };
 
 
   /*
