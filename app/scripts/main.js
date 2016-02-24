@@ -1,6 +1,19 @@
 (function() {
   /*
   ========================================
+      Game vars
+  ========================================
+   */
+
+  window.board = {
+    color: 0x999999,
+  }
+
+  var PLAYER_COLORS = [0xff0000, 0x1e09ff];
+
+  var playerTurn = 0;
+  /*
+  ========================================
       Scene Setup
   ========================================
    */
@@ -24,6 +37,7 @@
 
   // Register event listeners
   window.addEventListener( 'resize', onWindowResize, false );
+  document.addEventListener( 'click', onClick, false );
   document.addEventListener( 'keydown', onKeyDown, false );
   document.addEventListener( 'keyup', onKeyUp, false );
 
@@ -83,7 +97,7 @@
         // Save previous properties of intersected object to restore its properties on blur
         INTERSECTED = intersects[ 0 ].object;
         INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-        INTERSECTED.material.emissive.setHex( 0xff0000 );
+        INTERSECTED.material.emissive.setHex( PLAYER_COLORS[playerTurn] );
 
         // INTERSECTED.geometry = pieceGeometry;
       }
@@ -110,6 +124,15 @@
     camera.updateProjectionMatrix();
 
     renderer.setSize( window.innerWidth, window.innerHeight );
+  }
+
+  function onClick( event ) {
+    if(window.controls.enabled) {
+      // if(INTERSECTED.material.emissive.getHex())
+      INTERSECTED.currentHex = PLAYER_COLORS[playerTurn];
+
+      playerTurn = 1 - playerTurn;
+    }
   }
 
   function onKeyDown ( event ) {
