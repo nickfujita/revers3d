@@ -7,11 +7,15 @@ function initBoard() {
 
   // Constants
   var TILE_SIZE = 19;
-  var BUFFER = 1;
+  var BUFFER = 2;
+  var DEPTH = 1;
   var TILE_WIDTH = TILE_SIZE + BUFFER;
 
   var EDGE_LENGTH = TILE_WIDTH * Math.sin( Math.PI / 4 );
   var RADIUS = TILE_WIDTH + EDGE_LENGTH;
+
+  var material = { color: 0x999999/*, wireframe: true,*/ };
+
 
   /*
   ========================================
@@ -19,7 +23,7 @@ function initBoard() {
   ========================================
    */
 
-  var extrudeSettings = { amount: 1, bevelEnabled: false };
+  var extrudeSettings = { amount: DEPTH, bevelEnabled: false };
 
   var equiTri = new THREE.Shape();
   var CORNER_WIDTH = TILE_SIZE;
@@ -50,11 +54,9 @@ function initBoard() {
   ========================================
    */
 
-  var material = { color: 0x999999 };
-
   // Face geometry definitions
   // xyFace = face;
-  xyFace = new THREE.BoxGeometry( TILE_SIZE, TILE_SIZE, 1 );
+  xyFace = new THREE.BoxGeometry( TILE_SIZE, TILE_SIZE, DEPTH );
   yzFace = xyFace.clone().rotateY( -Math.PI / 2 );
   xzFace = xyFace.clone().rotateX( -Math.PI / 2 );
 
@@ -65,9 +67,6 @@ function initBoard() {
   nxEdge = xyFace.clone().rotateY( Math.PI / 4 );
   nyEdge = yzFace.clone().rotateZ( Math.PI / 4 );
   nzEdge = xyFace.clone().rotateX( Math.PI / 4) ;
-
-  // Corner geometry definitions
-  pppCor, ppnCor, pnpCor, pnnCor, nppCor, npnCor, nnpCor, nnnCor; // +/- x, y, z Corners
 
   // Place faces
   var faces = {};
@@ -124,11 +123,11 @@ function initBoard() {
   var edges = {};
 
   for(var x = -TILE_WIDTH - 1/2 * EDGE_LENGTH; x <= TILE_WIDTH + 1/2 * EDGE_LENGTH; x += 2 * (TILE_WIDTH + 1/2 * EDGE_LENGTH)) {
+    edges[x] = {};
     for(var y = -1/2 * TILE_WIDTH; y <= 1/2 * TILE_WIDTH; y += TILE_WIDTH) {
-      var z = -x;
-      edges[x] = {};
       edges[x][y] = {};
 
+      var z = -x;
       edges[x][y][z] = new THREE.Mesh( pxEdge, new THREE.MeshLambertMaterial(material) );
 
       edges[x][y][z].position.x = x;
@@ -140,11 +139,11 @@ function initBoard() {
   }
 
   for(var x = -TILE_WIDTH - 1/2 * EDGE_LENGTH; x <= TILE_WIDTH + 1/2 * EDGE_LENGTH; x += 2 * (TILE_WIDTH + 1/2 * EDGE_LENGTH)) {
+    edges[x] = {};
     for(var y = -1/2 * TILE_WIDTH; y <= 1/2 * TILE_WIDTH; y += TILE_WIDTH) {
-      var z = x;
-      edges[x] = {};
       edges[x][y] = {};
 
+      var z = x;
       edges[x][y][z] = new THREE.Mesh( nxEdge, new THREE.MeshLambertMaterial(material) );
 
       edges[x][y][z].position.x = x;
@@ -156,11 +155,11 @@ function initBoard() {
   }
 
   for(var x = -1/2 * TILE_WIDTH; x <= 1/2 * TILE_WIDTH; x += TILE_WIDTH) {
+    edges[x] = {};
     for(var y = -TILE_WIDTH - 1/2 * EDGE_LENGTH; y <= TILE_WIDTH + 1/2 * EDGE_LENGTH; y += 2 * (TILE_WIDTH + 1/2 * EDGE_LENGTH)) {
-      var z = -y;
-      edges[x] = {};
       edges[x][y] = {};
 
+      var z = -y;
       edges[x][y][z] = new THREE.Mesh( nzEdge, new THREE.MeshLambertMaterial(material) );
 
       edges[x][y][z].position.x = x;
@@ -172,11 +171,11 @@ function initBoard() {
   }
 
   for(var x = -1/2 * TILE_WIDTH; x <= 1/2 * TILE_WIDTH; x += TILE_WIDTH) {
+    edges[x] = {};
     for(var y = -TILE_WIDTH - 1/2 * EDGE_LENGTH; y <= TILE_WIDTH + 1/2 * EDGE_LENGTH; y += 2 * (TILE_WIDTH + 1/2 * EDGE_LENGTH)) {
-      var z = y;
-      edges[x] = {};
       edges[x][y] = {};
 
+      var z = y;
       edges[x][y][z] = new THREE.Mesh( pzEdge, new THREE.MeshLambertMaterial(material) );
 
       edges[x][y][z].position.x = x;
@@ -188,11 +187,10 @@ function initBoard() {
   }
 
   for(var y = -TILE_WIDTH - 1/2 * EDGE_LENGTH; y <= TILE_WIDTH + 1/2 * EDGE_LENGTH; y += 2 * (TILE_WIDTH + 1/2 * EDGE_LENGTH)) {
+    var x = y;
+    edges[x] = {};
+    edges[x][y] = {}
     for(var z = -1/2 * TILE_WIDTH; z <= 1/2 * TILE_WIDTH; z += TILE_WIDTH) {
-      var x = y;
-      edges[x] = {};
-      edges[x][y] = {};
-
       edges[x][y][z] = new THREE.Mesh( nyEdge, new THREE.MeshLambertMaterial(material) );
 
       edges[x][y][z].position.x = x;
@@ -204,11 +202,10 @@ function initBoard() {
   }
 
   for(var y = -TILE_WIDTH - 1/2 * EDGE_LENGTH; y <= TILE_WIDTH + 1/2 * EDGE_LENGTH; y += 2 * (TILE_WIDTH + 1/2 * EDGE_LENGTH)) {
+    var x = -y;
+    edges[x] = {};
+    edges[x][y] = {}
     for(var z = -1/2 * TILE_WIDTH; z <= 1/2 * TILE_WIDTH; z += TILE_WIDTH) {
-      var x = -y;
-      edges[x] = {};
-      edges[x][y] = {};
-
       edges[x][y][z] = new THREE.Mesh( pyEdge, new THREE.MeshLambertMaterial(material) );
 
       edges[x][y][z].position.x = x;
@@ -221,29 +218,29 @@ function initBoard() {
 
   // Place corners
   var corners = {};
-  var location = RADIUS - (2/3 * EDGE_LENGTH) + 0.25;
+  var location = RADIUS - (2/3 * EDGE_LENGTH) + 0.5;
 
   for(var x = -1; x <= 1; x += 2) {
     corners[x] = {};
     for(var y = -1; y <= 1; y += 2) {
       corners[x][y] = {};
       for(var z = -1; z <= 1; z += 2) {
-        corners[x][y][z] = {};
-
         corners[x][y][z] = new THREE.Mesh( corner, new THREE.MeshLambertMaterial(material) );
 
         corners[x][y][z].position.x = location * x;
         corners[x][y][z].position.y = location * y;
         corners[x][y][z].position.z = location * z;
-        // corners[x][y][z].rotateZ( -Math.PI / 4 );
+
         corners[x][y][z].rotateY( Math.PI / 4 * x * z );
-        // console.log(corners[x][y][z].rotateX.toString());
-
-        corners[x][y][z].rotateX( Math.PI / 5.1 * y * -z );
-
+        corners[x][y][z].rotateX( -Math.PI / 5.1 * y * z );
         if(Math.sign(y) < 0){
           corners[x][y][z].rotateZ( Math.PI / 3 );
         }
+
+        console.log(x, y , z, corners[x][y][z].position.x);
+        console.log(x, y , z, corners[x][y][z].position.y);
+        console.log(x, y , z, corners[x][y][z].position.z);
+
 
         scene.add(corners[x][y][z]);
       }
