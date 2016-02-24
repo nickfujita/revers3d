@@ -78,9 +78,7 @@ function initBoard() {
       for(var z = -1/2 * TILE_WIDTH; z <= 1/2 * TILE_WIDTH; z += TILE_WIDTH) {
         faces[x][y][z] = new THREE.Mesh( yzFace, new THREE.MeshLambertMaterial(material) );
 
-        faces[x][y][z].position.x = x;
-        faces[x][y][z].position.y = y;
-        faces[x][y][z].position.z = z;
+        faces[x][y][z].position.set(x, y, z);
 
         scene.add( faces[x][y][z] );
       }
@@ -94,9 +92,7 @@ function initBoard() {
       for(var z = -1/2 * TILE_WIDTH; z <= 1/2 * TILE_WIDTH; z += TILE_WIDTH) {
         faces[x][y][z] = new THREE.Mesh( xzFace, new THREE.MeshLambertMaterial(material) );
 
-        faces[x][y][z].position.x = x;
-        faces[x][y][z].position.y = y;
-        faces[x][y][z].position.z = z;
+        faces[x][y][z].position.set(x, y, z);
 
         scene.add( faces[x][y][z] );
       }
@@ -110,9 +106,7 @@ function initBoard() {
       for(var z = -RADIUS; z <= RADIUS; z += 2 * RADIUS) {
         faces[x][y][z] = new THREE.Mesh( xyFace, new THREE.MeshLambertMaterial(material) );
 
-        faces[x][y][z].position.x = x;
-        faces[x][y][z].position.y = y;
-        faces[x][y][z].position.z = z;
+        faces[x][y][z].position.set(x, y, z);
 
         scene.add( faces[x][y][z] );
       }
@@ -130,9 +124,7 @@ function initBoard() {
       var z = -x;
       edges[x][y][z] = new THREE.Mesh( pxEdge, new THREE.MeshLambertMaterial(material) );
 
-      edges[x][y][z].position.x = x;
-      edges[x][y][z].position.y = y;
-      edges[x][y][z].position.z = z;
+      edges[x][y][z].position.set(x, y, z);
 
       scene.add( edges[x][y][z] );
     }
@@ -146,9 +138,7 @@ function initBoard() {
       var z = x;
       edges[x][y][z] = new THREE.Mesh( nxEdge, new THREE.MeshLambertMaterial(material) );
 
-      edges[x][y][z].position.x = x;
-      edges[x][y][z].position.y = y;
-      edges[x][y][z].position.z = z;
+      edges[x][y][z].position.set(x, y, z);
 
       scene.add( edges[x][y][z] );
     }
@@ -162,9 +152,7 @@ function initBoard() {
       var z = -y;
       edges[x][y][z] = new THREE.Mesh( nzEdge, new THREE.MeshLambertMaterial(material) );
 
-      edges[x][y][z].position.x = x;
-      edges[x][y][z].position.y = y;
-      edges[x][y][z].position.z = z;
+      edges[x][y][z].position.set(x, y, z);
 
       scene.add( edges[x][y][z] );
     }
@@ -178,9 +166,7 @@ function initBoard() {
       var z = y;
       edges[x][y][z] = new THREE.Mesh( pzEdge, new THREE.MeshLambertMaterial(material) );
 
-      edges[x][y][z].position.x = x;
-      edges[x][y][z].position.y = y;
-      edges[x][y][z].position.z = z;
+      edges[x][y][z].position.set(x, y, z);
 
       scene.add( edges[x][y][z] );
     }
@@ -193,9 +179,7 @@ function initBoard() {
     for(var z = -1/2 * TILE_WIDTH; z <= 1/2 * TILE_WIDTH; z += TILE_WIDTH) {
       edges[x][y][z] = new THREE.Mesh( nyEdge, new THREE.MeshLambertMaterial(material) );
 
-      edges[x][y][z].position.x = x;
-      edges[x][y][z].position.y = y;
-      edges[x][y][z].position.z = z;
+      edges[x][y][z].position.set(x, y, z);
 
       scene.add( edges[x][y][z] );
     }
@@ -208,9 +192,7 @@ function initBoard() {
     for(var z = -1/2 * TILE_WIDTH; z <= 1/2 * TILE_WIDTH; z += TILE_WIDTH) {
       edges[x][y][z] = new THREE.Mesh( pyEdge, new THREE.MeshLambertMaterial(material) );
 
-      edges[x][y][z].position.x = x;
-      edges[x][y][z].position.y = y;
-      edges[x][y][z].position.z = z;
+      edges[x][y][z].position.set(x, y, z);
 
       scene.add( edges[x][y][z] );
     }
@@ -227,9 +209,7 @@ function initBoard() {
       for(var z = -1; z <= 1; z += 2) {
         corners[x][y][z] = new THREE.Mesh( corner, new THREE.MeshLambertMaterial(material) );
 
-        corners[x][y][z].position.x = location * x;
-        corners[x][y][z].position.y = location * y;
-        corners[x][y][z].position.z = location * z;
+        corners[x][y][z].position.set(location * x, location * y, location * z);
 
         corners[x][y][z].rotateY( Math.PI / 4 * x * z );
         corners[x][y][z].rotateX( -Math.PI / 5.1 * y * z );
@@ -237,26 +217,8 @@ function initBoard() {
           corners[x][y][z].rotateZ( Math.PI / 3 );
         }
 
-        console.log(x, y , z, corners[x][y][z].position.x);
-        console.log(x, y , z, corners[x][y][z].position.y);
-        console.log(x, y , z, corners[x][y][z].position.z);
-
-
         scene.add(corners[x][y][z]);
       }
     }
   }
-
-  // corners.ppn = new THREE.Mesh( corner, new THREE.MeshLambertMaterial(material) );
-  // asdf.position.x = RADIUS - (2/3 * EDGE_LENGTH) + 0.25;
-  // asdf.position.y = RADIUS - (2/3 * EDGE_LENGTH) + 0.25;
-  // asdf.position.z = -RADIUS + (2/3 * EDGE_LENGTH) - 0.25;
-  // // asdf.rotateZ( -Math.PI / 4 );
-  // asdf.rotateY( -Math.PI / 4 );
-  // // console.log(asdf.rotateX.toString());
-
-  // asdf.rotateX( Math.PI / 5.1 );
-  // // asdf.rotateZ( -Math.PI / 3 );
-
-  // scene.add(asdf);
 }
