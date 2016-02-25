@@ -4,7 +4,6 @@
       Game vars
   ========================================
    */
-
   window.board = {
     color: 0x999999,
   }
@@ -12,6 +11,7 @@
   var PLAYER_COLORS = [0xff0000, 0x1e09ff];
 
   var playerTurn = 0;
+
   /*
   ========================================
       Scene Setup
@@ -93,19 +93,16 @@
 
     if ( intersects.length > 0 ) {
       if ( INTERSECTED != intersects[ 0 ].object ) {
-        // if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+        if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
         // Save previous properties of intersected object to restore its properties on blur
         INTERSECTED = intersects[ 0 ].object;
-        // INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-        // INTERSECTED.material.emissive.setHex( PLAYER_COLORS[playerTurn] );
-
-        // INTERSECTED.geometry = pieceGeometry;
+        INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+        INTERSECTED.material.emissive.setHex( PLAYER_COLORS[playerTurn] );
       }
     } else {
       if(INTERSECTED) {
         // Restore previous properties of intersection
-        // if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-        // INTERSECTED.geometry = xyFace;
+        if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
         INTERSECTED = null;
       }
     }
@@ -118,7 +115,6 @@
       Event Handlers
   ========================================
    */
-
   function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();

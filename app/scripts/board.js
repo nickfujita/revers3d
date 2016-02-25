@@ -14,6 +14,7 @@ function initBoard() {
   var EDGE_LENGTH = TILE_WIDTH * Math.sin( Math.PI / 4 );
   var RADIUS = TILE_WIDTH + EDGE_LENGTH;
 
+  var CENTER_OF_THE_UNIVERSE = new THREE.Vector3( 0, 0, 0 );
   var material = { color: window.board.color/*, wireframe: true,*/ };
 
 
@@ -34,19 +35,6 @@ function initBoard() {
   equiTri.lineTo( -1/2 * CORNER_WIDTH, -1/3 * CORNER_HEIGHT );
 
   var corner = new THREE.ExtrudeGeometry( equiTri, extrudeSettings );
-
-  // var square = new THREE.Shape();
-  // square.moveTo(-9.5, -9.5)
-  // square.lineTo(-9.5, 9.5);
-  // square.lineTo(9.5, 9.5);
-  // square.lineTo(9.5, -9.5);
-  // square.lineTo(-9.5, -9.5);
-
-  // // var sqMin = new THREE.Vector2(0, 0);
-  // // var sqMax = new THREE.Vector2(TILE_SIZE, TILE_SIZE);
-
-  // var face = new THREE.ExtrudeGeometry( square, extrudeSettings );
-
 
   /*
   ========================================
@@ -200,7 +188,7 @@ function initBoard() {
 
   // Place corners
   var corners = {};
-  var location = RADIUS - (2/3 * EDGE_LENGTH) + 0.5;
+  var location = RADIUS - (2/3 * EDGE_LENGTH) + 0.33;
 
   for(var x = -1; x <= 1; x += 2) {
     corners[x] = {};
@@ -211,8 +199,8 @@ function initBoard() {
 
         corners[x][y][z].position.set(location * x, location * y, location * z);
 
-        corners[x][y][z].rotateY( Math.PI / 4 * x * z );
-        corners[x][y][z].rotateX( -Math.PI / 5.1 * y * z );
+        // Set rotation
+        corners[x][y][z].lookAt( CENTER_OF_THE_UNIVERSE );
         if(Math.sign(y) < 0){
           corners[x][y][z].rotateZ( Math.PI / 3 );
         }
