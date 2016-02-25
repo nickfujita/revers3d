@@ -44,7 +44,8 @@
   window.socket = io('http://localhost:3030');
   initBoard();
   var prevTime = performance.now();
-  animate();
+  window.requestAnimationFrame( animate );
+
 
   /*
   ========================================
@@ -59,11 +60,23 @@
   var moveLeft = false;
   var moveRight = false;
 
-  function animate() {
-    requestAnimationFrame( animate );
+  // FPS
+  var fps = new Stats();
+  fps.setMode( 0 ); // 0: fps, 1: ms, 2: mb
+
+  // align top-left
+  fps.domElement.style.position = 'absolute';
+  fps.domElement.style.left = '0px';
+  fps.domElement.style.top = '0px';
+
+  document.body.appendChild( fps.domElement );
+  fps.domElement.style.display = 'none';
+
+  function animate(time) {
+    // Begin FPS calculation
+    fps.begin();
 
     if ( controls.enabled ) {
-      var time = performance.now();
       var delta = ( time - prevTime ) / 1000;
 
       velocity.x -= velocity.x * 10.0 * delta;
@@ -71,12 +84,18 @@
 
       if ( moveForward ) velocity.z -= 400.0 * delta;
       if ( moveBackward ) velocity.z += 400.0 * delta;
-
       if ( moveLeft ) velocity.x -= 400.0 * delta;
       if ( moveRight ) velocity.x += 400.0 * delta;
 
       controls.getObject().translateX( velocity.x * delta );
       controls.getObject().translateZ( velocity.z * delta );
+
+      // Calculate fps
+      // elapsed = Math.floor(time / 1000);
+      // if(elapsed > seconds) {
+      //   console.log('fps:', 1/delta);
+      //   seconds = elapsed;
+      // }
 
       prevTime = time;
     }
@@ -106,8 +125,12 @@
         INTERSECTED = null;
       }
     }
-
     renderer.render( scene, camera );
+
+    // End FPS calculation
+    fps.end();
+
+    window.requestAnimationFrame( animate );
   }
 
   /*
@@ -179,6 +202,16 @@
       case 39: // right
       case 68: // d
         moveRight = false;
+        break;
+
+      case 70: // f
+        if(event.ctrlKey) {
+          if(fps.domElement.style.display === 'none') {
+            fps.domElement.style.display = 'block';
+          } else {
+            fps.domElement.style.display = 'none';
+          }
+        }
         break;
     }
   };
