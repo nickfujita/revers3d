@@ -41,8 +41,8 @@
   document.addEventListener( 'keydown', onKeyDown, false );
   document.addEventListener( 'keyup', onKeyUp, false );
 
+  window.socket = io('http://localhost:3030');
   initBoard();
-
   var prevTime = performance.now();
   animate();
 
@@ -93,18 +93,18 @@
 
     if ( intersects.length > 0 ) {
       if ( INTERSECTED != intersects[ 0 ].object ) {
-        if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+        // if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
         // Save previous properties of intersected object to restore its properties on blur
         INTERSECTED = intersects[ 0 ].object;
-        INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-        INTERSECTED.material.emissive.setHex( PLAYER_COLORS[playerTurn] );
+        // INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+        // INTERSECTED.material.emissive.setHex( PLAYER_COLORS[playerTurn] );
 
         // INTERSECTED.geometry = pieceGeometry;
       }
     } else {
       if(INTERSECTED) {
         // Restore previous properties of intersection
-        if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+        // if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
         // INTERSECTED.geometry = xyFace;
         INTERSECTED = null;
       }
