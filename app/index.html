@@ -6,9 +6,12 @@
     <!-- dependencies -->
     <script src="./components/three.js/build/three.min.js"></script>
     <script src="./scripts/fps/build/stats.min.js"></script>
-    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <script src="./components/socket.io-client/socket.io.js"></script>
+    <!-- <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script> -->
 
     <!-- Utils -->
+    <script defer src="./components/three.js/examples/js/effects/StereoEffect.js"></script>
+    <script defer src="./components/three.js/examples/js/controls/DeviceOrientationControls.js"></script>
     <script defer src="./components/three.js/examples/js/controls/PointerLockControls.js"></script>
     <script defer src="./components/three.js/examples/js/utils/GeometryUtils.js"></script>
 
@@ -22,10 +25,13 @@
       <div id="instructions">
         <span style="font-size:40px">Click to play</span>
         <br />
-        (W, A, S, D = Move, MOUSE = Look around)
+        (Use the MOUSE to look around, and CLICK to select the tile)
       </div>
+      <img src="./resources/VR-icon.png" alt="enable VR" id="vr-icon"/>
+      <img src="./resources/screen-icon.png" alt="disable VR" id="screen-icon"/>
     </div>
 
-    <span id="xhair">o</span>
+
+    <!-- <span id="xhair">o</span> -->
   </body>
 </html>

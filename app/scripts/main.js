@@ -27,19 +27,28 @@
   scene.add( light );
 
   window.controls = new THREE.PointerLockControls( camera );
+  // window.controls = new THREE.DeviceOrientationControls(camera, true);
   scene.add( controls.getObject() );
 
   var renderer = new THREE.WebGLRenderer();
   renderer.setClearColor( 0xffffff );
   renderer.setPixelRatio( window.devicePixelRatio );
   renderer.setSize( window.innerWidth, window.innerHeight );
+  effect = new THREE.StereoEffect(renderer);
   document.body.appendChild( renderer.domElement );
 
   // Register event listeners
+  // window.addEventListener('deviceorientation', setOrientationControls, true);
   window.addEventListener( 'resize', onWindowResize, false );
   document.addEventListener( 'click', onClick, false );
   document.addEventListener( 'keydown', onKeyDown, false );
   document.addEventListener( 'keyup', onKeyUp, false );
+
+  var vrButton = document.getElementById('vr-icon');
+  var screenButton = document.getElementById('screen-icon');
+  vrButton.addEventListener( 'click', toggleVR, false );
+  screenButton.addEventListener( 'click', toggleVR, false );
+
 
   window.socket = io('http://localhost:3030');
   initBoard();
@@ -70,7 +79,7 @@
   fps.domElement.style.top = '0px';
 
   document.body.appendChild( fps.domElement );
-  fps.domElement.style.display = 'none';
+  // fps.domElement.style.display = 'none';
 
   function animate(time) {
     // Begin FPS calculation
@@ -90,15 +99,11 @@
       controls.getObject().translateX( velocity.x * delta );
       controls.getObject().translateZ( velocity.z * delta );
 
-      // Calculate fps
-      // elapsed = Math.floor(time / 1000);
-      // if(elapsed > seconds) {
-      //   console.log('fps:', 1/delta);
-      //   seconds = elapsed;
-      // }
+      camera.updateProjectionMatrix();
 
       prevTime = time;
     }
+    // controls.update();
 
     var sightline = new THREE.Raycaster();
     var mouse = new THREE.Vector2();
@@ -125,7 +130,7 @@
         INTERSECTED = null;
       }
     }
-    renderer.render( scene, camera );
+    effect.render( scene, camera );
 
     // End FPS calculation
     fps.end();
@@ -138,6 +143,44 @@
       Event Handlers
   ========================================
    */
+  function setOrientationControls(e) {
+    if (!e.alpha) {
+      return;
+    }
+
+    controls = new THREE.DeviceOrientationControls(camera, true);
+    controls.connect();
+    controls.update();
+    element.addEventListener('click', fullscreen, false);
+
+    window.removeEventListener('deviceorientation', setOrientationControls, true);
+  }
+
+  function fullscreen() {
+    if (container.requestFullscreen) {
+      container.requestFullscreen();
+    } else if (container.msRequestFullscreen) {
+      container.msRequestFullscreen();
+    } else if (container.mozRequestFullScreen) {
+      container.mozRequestFullScreen();
+    } else if (container.webkitRequestFullscreen) {
+      container.webkitRequestFullscreen();
+    }
+  }
+
+  function toggleVR(event) {
+    event.stopPropagation();
+
+    if(vrButton.style.display === "none") {
+      vrButton.style.display = "block";
+      screenButton.style.display = "none";
+    }
+    else {
+      vrButton.style.display = "none";
+      screenButton.style.display = "block";
+    }
+  }
+
   function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
