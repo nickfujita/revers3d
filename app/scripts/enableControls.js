@@ -1,4 +1,4 @@
-(function() {
+window.enablePointerLock = function() {
   var blocker = document.getElementById( 'blocker' );
   var instructions = document.getElementById( 'instructions' );
 
@@ -38,6 +38,7 @@
     document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
 
     instructions.addEventListener( 'click', function ( event ) {
+      event.stopPropagation();
       instructions.style.display = 'none';
 
       // Ask the browser to lock the pointer
@@ -66,4 +67,4 @@
   } else {
     instructions.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
   }
-})();
+};

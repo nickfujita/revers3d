@@ -79,3 +79,24 @@ body {
 
   color: aqua;
 }
+
+#vr-icon {
+  display: none;
+  width: 100px;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  /*background-color: #ffefd5;
+  border-radius: 10px;*/
+}
+
+#screen-icon {
+  display: none;
+  /*padding: -7px 13px;*/
+  height: 50px;
+  position: fixed;
+  right: 13px;
+  bottom: 5px;
+  /*background-color: #ffefd5;
+  border-radius: 10px;*/
+}
