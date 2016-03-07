@@ -175,11 +175,14 @@
   }
 
   function onClick( event ) {
-    if(window.controls.enabled) {
-      // if(focus.material.emissive.getHex())
-      focus.currentHex = PLAYER_COLORS[playerTurn];
+    event.stopPropagation();
 
+    if(INTERSECTED) {
+      INTERSECTED.currentHex = PLAYER_COLORS[playerTurn];
       playerTurn = 1 - playerTurn;
+    }
+    else {
+      console.log('no tile selected');
     }
   }
 

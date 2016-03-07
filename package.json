@@ -2,7 +2,7 @@
   "name": "othello",
   "version": "0.0.0",
   "description": "Play othello/reversi. With a friend. In 3d. In VR.",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "postinstall": "bower install",
     "start": "node server",

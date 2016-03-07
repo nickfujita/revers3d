@@ -1,34 +1,29 @@
 function initBoard() {
   var pieceGeometry = new THREE.IcosahedronGeometry(.4, 0);
 
-  var xyFace, yzFace, xzFace; // Faces along given axes
-  var pxEdge, nxEdge, pyEdge, nyEdge, pzEdge, nzEdge; // +/- sloped edges along axis
-  var pppCor, ppnCor, pnpCor, pnnCor, nppCor, npnCor, nnpCor, nnnCor; // +/- x, y, z Corners
-
   // Constants
   var TILE_WIDTH = 19;
-  var BUFFER = 2;
+  var BUFFER = 3;
   var DEPTH = 1;
   var TILE_SIZE = TILE_WIDTH + BUFFER;
-  //Old Vars
+  var CENTER_OF_THE_UNIVERSE = new THREE.Vector3( 0, 0, 0 );
+
+  // Tile coords
   var EDGE_LENGTH = TILE_SIZE * Math.sin( Math.PI / 4 );
-  var RADIUS = TILE_SIZE + EDGE_LENGTH;
-  //New Vars
   var LEG_LENGTH = TILE_SIZE * Math.sin( Math.PI / 4 );
+  // face = aab
+  // edge = cca
+  // corner = ddd
   var a = 1/2 * TILE_SIZE;
   var b = TILE_SIZE + LEG_LENGTH;
   var c = TILE_SIZE + (1/2 * LEG_LENGTH);
-  // face = aab
-  // edge = cca
-  // corner = ccc
+  var d = TILE_SIZE + (1/3 * LEG_LENGTH) + (1/2 * DEPTH);
 
-  var CENTER_OF_THE_UNIVERSE = new THREE.Vector3( 0, 0, 0 );
   var material = { color: window.board.color/*, wireframe: true,*/ };
-
 
   /*
   ========================================
-      Tile Shapes
+      Tile Geometries
   ========================================
    */
 
@@ -44,28 +39,27 @@ function initBoard() {
 
   var corner = new THREE.ExtrudeGeometry( equiTri, extrudeSettings );
 
+  // Face geometry definitions
+  var zFace = new THREE.BoxGeometry( TILE_WIDTH, TILE_WIDTH, DEPTH );
+  var yFace = zFace.clone().rotateX( -Math.PI / 2 );
+  var xFace = zFace.clone().rotateY( -Math.PI / 2 );
+
+  // Edge geometry definitions
+  var pxEdge = yFace.clone().rotateX( Math.PI / 4 );
+  var nxEdge = yFace.clone().rotateX( -Math.PI / 4 );
+  var pyEdge = zFace.clone().rotateY( Math.PI / 4 );
+  var nyEdge = zFace.clone().rotateY( -Math.PI / 4 );
+  var pzEdge = xFace.clone().rotateZ( Math.PI / 4 );
+  var nzEdge = xFace.clone().rotateZ( -Math.PI / 4) ;
+
   /*
   ========================================
       Tile Placement
   ========================================
    */
-
-  // Face geometry definitions
-  zFace = new THREE.BoxGeometry( TILE_WIDTH, TILE_WIDTH, DEPTH );
-  yFace = zFace.clone().rotateX( -Math.PI / 2 );
-  xFace = zFace.clone().rotateY( -Math.PI / 2 );
-
-  // Edge geometry definitions
-  pxEdge = yFace.clone().rotateX( Math.PI / 4 );
-  nxEdge = yFace.clone().rotateX( -Math.PI / 4 );
-  pyEdge = zFace.clone().rotateY( Math.PI / 4 );
-  nyEdge = zFace.clone().rotateY( -Math.PI / 4 );
-  pzEdge = xFace.clone().rotateZ( Math.PI / 4 );
-  nzEdge = xFace.clone().rotateZ( -Math.PI / 4) ;
-
-  // Place faces
-  var faces = allCombos([a, a, b], 0);
   var geometry;
+
+  var faces = allCombos([a, a, b], 0);
 
   for(var x in faces) {
     for(var y in faces[x]) {
@@ -92,11 +86,11 @@ function initBoard() {
     for(var y in edges[x]) {
       for(var z in edges[x][y]) {
         if(Math.abs(x) == a) {
-          geometry = y > 0 ? nxEdge : pxEdge;
+          geometry = y * z < 0 ? nxEdge : pxEdge;
         } else if(Math.abs(y) == a) {
-          geometry = z > 0 ? nyEdge : pyEdge;
+          geometry = x * z < 0 ? nyEdge : pyEdge;
         } else {
-          geometry = x > 0 ? nzEdge : pzEdge;
+          geometry = x * y < 0 ? nzEdge : pzEdge;
         }
 
         edges[x][y][z] = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial(material) );
@@ -107,7 +101,7 @@ function initBoard() {
     }
   }
 
-  var corners = allCombos([c, c, c], 0);
+  var corners = allCombos([d, d, d], 0);
 
   for(var x in corners) {
     for(var y in corners[x]) {
@@ -123,158 +117,6 @@ function initBoard() {
       }
     }
   }
-
-
-  // for(var x = -RADIUS; x <= RADIUS; x += 2 * RADIUS) {
-  //   faces[x] = {};
-  //   for(var y = -1/2 * TILE_SIZE; y <= 1/2 * TILE_SIZE; y += TILE_SIZE) {
-  //     faces[x][y] = {};
-  //     for(var z = -1/2 * TILE_SIZE; z <= 1/2 * TILE_SIZE; z += TILE_SIZE) {
-  //       faces[x][y][z] = new THREE.Mesh( yzFace, new THREE.MeshLambertMaterial(material) );
-
-  //       faces[x][y][z].position.set(x, y, z);
-
-  //       scene.add( faces[x][y][z] );
-  //     }
-  //   }
-  // }
-
-  // for(var x = -1/2 * TILE_SIZE; x <= 1/2 * TILE_SIZE; x += TILE_SIZE) {
-  //   faces[x] = {};
-  //   for(var y = -RADIUS; y <= RADIUS; y += 2 * RADIUS) {
-  //     faces[x][y] = {};
-  //     for(var z = -1/2 * TILE_SIZE; z <= 1/2 * TILE_SIZE; z += TILE_SIZE) {
-  //       faces[x][y][z] = new THREE.Mesh( xzFace, new THREE.MeshLambertMaterial(material) );
-
-  //       faces[x][y][z].position.set(x, y, z);
-
-  //       scene.add( faces[x][y][z] );
-  //     }
-  //   }
-  // }
-
-  // for(var x = -1/2 * TILE_SIZE; x <= 1/2 * TILE_SIZE; x += TILE_SIZE) {
-  //   faces[x] = {};
-  //   for(var y = -1/2 * TILE_SIZE; y <= 1/2 * TILE_SIZE; y += TILE_SIZE) {
-  //     faces[x][y] = {};
-  //     for(var z = -RADIUS; z <= RADIUS; z += 2 * RADIUS) {
-  //       faces[x][y][z] = new THREE.Mesh( xyFace, new THREE.MeshLambertMaterial(material) );
-
-  //       faces[x][y][z].position.set(x, y, z);
-
-  //       scene.add( faces[x][y][z] );
-  //     }
-  //   }
-  // }
-
-  // Place edges
-  // var edges = {};
-
-  // for(var x = -TILE_SIZE - 1/2 * EDGE_LENGTH; x <= TILE_SIZE + 1/2 * EDGE_LENGTH; x += 2 * (TILE_SIZE + 1/2 * EDGE_LENGTH)) {
-  //   edges[x] = {};
-  //   for(var y = -1/2 * TILE_SIZE; y <= 1/2 * TILE_SIZE; y += TILE_SIZE) {
-  //     edges[x][y] = {};
-
-  //     var z = -x;
-  //     edges[x][y][z] = new THREE.Mesh( pxEdge, new THREE.MeshLambertMaterial(material) );
-
-  //     edges[x][y][z].position.set(x, y, z);
-
-  //     scene.add( edges[x][y][z] );
-  //   }
-  // }
-
-  // for(var x = -TILE_SIZE - 1/2 * EDGE_LENGTH; x <= TILE_SIZE + 1/2 * EDGE_LENGTH; x += 2 * (TILE_SIZE + 1/2 * EDGE_LENGTH)) {
-  //   edges[x] = {};
-  //   for(var y = -1/2 * TILE_SIZE; y <= 1/2 * TILE_SIZE; y += TILE_SIZE) {
-  //     edges[x][y] = {};
-
-  //     var z = x;
-  //     edges[x][y][z] = new THREE.Mesh( nxEdge, new THREE.MeshLambertMaterial(material) );
-
-  //     edges[x][y][z].position.set(x, y, z);
-
-  //     scene.add( edges[x][y][z] );
-  //   }
-  // }
-
-  // for(var x = -1/2 * TILE_SIZE; x <= 1/2 * TILE_SIZE; x += TILE_SIZE) {
-  //   edges[x] = {};
-  //   for(var y = -TILE_SIZE - 1/2 * EDGE_LENGTH; y <= TILE_SIZE + 1/2 * EDGE_LENGTH; y += 2 * (TILE_SIZE + 1/2 * EDGE_LENGTH)) {
-  //     edges[x][y] = {};
-
-  //     var z = -y;
-  //     edges[x][y][z] = new THREE.Mesh( nzEdge, new THREE.MeshLambertMaterial(material) );
-
-  //     edges[x][y][z].position.set(x, y, z);
-
-  //     scene.add( edges[x][y][z] );
-  //   }
-  // }
-
-  // for(var x = -1/2 * TILE_SIZE; x <= 1/2 * TILE_SIZE; x += TILE_SIZE) {
-  //   edges[x] = {};
-  //   for(var y = -TILE_SIZE - 1/2 * EDGE_LENGTH; y <= TILE_SIZE + 1/2 * EDGE_LENGTH; y += 2 * (TILE_SIZE + 1/2 * EDGE_LENGTH)) {
-  //     edges[x][y] = {};
-
-  //     var z = y;
-  //     edges[x][y][z] = new THREE.Mesh( pzEdge, new THREE.MeshLambertMaterial(material) );
-
-  //     edges[x][y][z].position.set(x, y, z);
-
-  //     scene.add( edges[x][y][z] );
-  //   }
-  // }
-
-  // for(var y = -TILE_SIZE - 1/2 * EDGE_LENGTH; y <= TILE_SIZE + 1/2 * EDGE_LENGTH; y += 2 * (TILE_SIZE + 1/2 * EDGE_LENGTH)) {
-  //   var x = y;
-  //   edges[x] = {};
-  //   edges[x][y] = {}
-  //   for(var z = -1/2 * TILE_SIZE; z <= 1/2 * TILE_SIZE; z += TILE_SIZE) {
-  //     edges[x][y][z] = new THREE.Mesh( nyEdge, new THREE.MeshLambertMaterial(material) );
-
-  //     edges[x][y][z].position.set(x, y, z);
-
-  //     scene.add( edges[x][y][z] );
-  //   }
-  // }
-
-  // for(var y = -TILE_SIZE - 1/2 * EDGE_LENGTH; y <= TILE_SIZE + 1/2 * EDGE_LENGTH; y += 2 * (TILE_SIZE + 1/2 * EDGE_LENGTH)) {
-  //   var x = -y;
-  //   edges[x] = {};
-  //   edges[x][y] = {}
-  //   for(var z = -1/2 * TILE_SIZE; z <= 1/2 * TILE_SIZE; z += TILE_SIZE) {
-  //     edges[x][y][z] = new THREE.Mesh( pyEdge, new THREE.MeshLambertMaterial(material) );
-
-  //     edges[x][y][z].position.set(x, y, z);
-
-  //     scene.add( edges[x][y][z] );
-  //   }
-  // }
-
-  // // Place corners
-  // var corners = {};
-  // var location = RADIUS - (2/3 * EDGE_LENGTH) + 0.33;
-
-  // for(var x = -1; x <= 1; x += 2) {
-  //   corners[x] = {};
-  //   for(var y = -1; y <= 1; y += 2) {
-  //     corners[x][y] = {};
-  //     for(var z = -1; z <= 1; z += 2) {
-  //       corners[x][y][z] = new THREE.Mesh( corner, new THREE.MeshLambertMaterial(material) );
-
-  //       corners[x][y][z].position.set(location * x, location * y, location * z);
-
-  //       // Set rotation
-  //       corners[x][y][z].lookAt( CENTER_OF_THE_UNIVERSE );
-  //       if(Math.sign(y) < 0){
-  //         corners[x][y][z].rotateZ( Math.PI / 3 );
-  //       }
-
-  //       scene.add(corners[x][y][z]);
-  //     }
-  //   }
-  // }
 }
 
 /*
