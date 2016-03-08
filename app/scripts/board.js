@@ -1,4 +1,7 @@
-function initBoard() {
+function initGame() {
+  window.gameState = {};
+  window.board = new THREE.Object3D();
+
   var pieceGeometry = new THREE.IcosahedronGeometry(.4, 0);
 
   // Constants
@@ -19,7 +22,7 @@ function initBoard() {
   var c = TILE_SIZE + (1/2 * LEG_LENGTH);
   var d = TILE_SIZE + (1/3 * LEG_LENGTH) + (1/2 * DEPTH);
 
-  var material = { color: window.board.color/*, wireframe: true,*/ };
+  var material = { color: 0x999999/*, wireframe: true,*/ };
 
   /*
   ========================================
@@ -57,13 +60,13 @@ function initBoard() {
       Tile Placement
   ========================================
    */
-  var geometry;
+  var geometry, mesh;
 
-  var faces = allCombos([a, a, b], 0);
+  gameState.faces = allCombos([a, a, b], new Tile());
 
-  for(var x in faces) {
-    for(var y in faces[x]) {
-      for(var z in faces[x][y]) {
+  for(var x in gameState.faces) {
+    for(var y in gameState.faces[x]) {
+      for(var z in gameState.faces[x][y]) {
         if(Math.abs(x) == b) {
           geometry = xFace;
         } else if(Math.abs(y) == b) {
@@ -72,19 +75,21 @@ function initBoard() {
           geometry = zFace;
         }
 
-        faces[x][y][z] = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial(material) );
-        faces[x][y][z].position.set(x, y, z);
+        mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial(material) );
+        mesh.position.set(x, y, z);
 
-        scene.add( faces[x][y][z] );
+        board.add( mesh );
+
+        // scene.add( gameState.faces[x][y][z] );
       }
     }
   }
 
-  var edges = allCombos([c, c, a], 0);
+  gameState.edges = allCombos([c, c, a], new Tile());
 
-  for(var x in edges) {
-    for(var y in edges[x]) {
-      for(var z in edges[x][y]) {
+  for(var x in gameState.edges) {
+    for(var y in gameState.edges[x]) {
+      for(var z in gameState.edges[x][y]) {
         if(Math.abs(x) == a) {
           geometry = y * z < 0 ? nxEdge : pxEdge;
         } else if(Math.abs(y) == a) {
@@ -93,30 +98,35 @@ function initBoard() {
           geometry = x * y < 0 ? nzEdge : pzEdge;
         }
 
-        edges[x][y][z] = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial(material) );
-        edges[x][y][z].position.set(x, y, z);
+        mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial(material) );
+        mesh.position.set(x, y, z);
 
-        scene.add( edges[x][y][z] );
+        board.add( mesh );
       }
     }
   }
 
-  var corners = allCombos([d, d, d], 0);
+  gameState.corners = allCombos([d, d, d], new Tile());
 
-  for(var x in corners) {
-    for(var y in corners[x]) {
-      for(var z in corners[x][y]) {
-        corners[x][y][z] = new THREE.Mesh( corner, new THREE.MeshLambertMaterial(material) );
-        corners[x][y][z].position.set(x, y, z);
-        corners[x][y][z].lookAt( CENTER_OF_THE_UNIVERSE );
+  for(var x in gameState.corners) {
+    for(var y in gameState.corners[x]) {
+      for(var z in gameState.corners[x][y]) {
+        gameState.corners[x][y][z].isCorner = true;
+
+        mesh = new THREE.Mesh( corner, new THREE.MeshLambertMaterial(material) );
+        mesh.position.set(x, y, z);
+        mesh.lookAt( CENTER_OF_THE_UNIVERSE );
+
         if(Math.sign(y) < 0){
-          corners[x][y][z].rotateZ( Math.PI / 3 );
+          mesh.rotateZ( Math.PI / 3 );
         }
 
-        scene.add( corners[x][y][z] );
+        board.add( mesh );
       }
     }
   }
+
+  scene.add( board );
 }
 
 /*
@@ -140,4 +150,32 @@ function allCombos(remaining, init) {
   }
 
   return objSoFar;
+}
+
+/*
+========================================
+    Graph Nodes (board tiles)
+========================================
+ */
+
+function Tile() {
+  this.ownedBy = null;
+  this.isCorner = false;
+  this.A = null; // up
+  this.a = null; // down
+  this.B = null; // up right
+  this.b = null; // down left
+  this.C = null; // right
+  this.c = null; // left
+  this.D = null; // down right
+  this.d = null; // up left
+}
+
+/**
+ * Direction in which to check for tiles for capture
+ * @param  {char} direction direction to traverse
+ * @return {num}            number of pieces captured
+ */
+Tile.prototype.traverse = function(direction) {
+
 }
