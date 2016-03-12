@@ -17,12 +17,138 @@ function initGame() {
   // face = aab
   // edge = cca
   // corner = ddd
-  var a = 1/2 * TILE_SIZE;
-  var b = TILE_SIZE + LEG_LENGTH;
-  var c = TILE_SIZE + (1/2 * LEG_LENGTH);
-  var d = TILE_SIZE + (1/3 * LEG_LENGTH) + (1/2 * DEPTH);
+  var MID_TILE = 1/2 * TILE_SIZE;
+  var RADIUS = TILE_SIZE + LEG_LENGTH;
+  var EDGE_DISTANCE = TILE_SIZE + (1/2 * LEG_LENGTH);
+  var CORNER_DISTANCE = TILE_SIZE + (1/3 * LEG_LENGTH) + (1/2 * DEPTH);
 
   var material = { color: 0x999999/*, wireframe: true,*/ };
+
+  /*
+  ========================================
+      Init game state
+  ========================================
+   */
+
+  var faces = allCombos([MID_TILE, MID_TILE, RADIUS], new Tile());
+  var edges = allCombos([EDGE_DISTANCE, EDGE_DISTANCE, MID_TILE], new Tile());
+  var corners = allCombos([CORNER_DISTANCE, CORNER_DISTANCE, CORNER_DISTANCE], new Tile());
+
+  gameState.a1 = faces[ -MID_TILE ][ RADIUS ][ MID_TILE ];
+  gameState.a2 = faces[ MID_TILE ][ RADIUS ][ MID_TILE ];
+  gameState.a3 = faces[ -MID_TILE ][ RADIUS ][ -MID_TILE ];
+  gameState.a4 = faces[ MID_TILE ][ RADIUS ][ -MID_TILE ];
+  gameState.a5 = edges[ -MID_TILE ][ EDGE_DISTANCE ][ -EDGE_DISTANCE ];
+  gameState.a6 = edges[ MID_TILE ][ EDGE_DISTANCE ][ -EDGE_DISTANCE ];
+  gameState.a7 = corners[ CORNER_DISTANCE ][ CORNER_DISTANCE ][ -CORNER_DISTANCE ];
+  gameState.a8 = edges[ EDGE_DISTANCE ][ EDGE_DISTANCE ][ -MID_TILE ];
+  gameState.b1 = edges[ EDGE_DISTANCE ][ EDGE_DISTANCE ][ MID_TILE ];
+  gameState.b2 = corners[ CORNER_DISTANCE ][ CORNER_DISTANCE ][ CORNER_DISTANCE ];
+  gameState.b3 = edges[ MID_TILE ][ EDGE_DISTANCE ][ EDGE_DISTANCE ];
+  gameState.b4 = edges[ -MID_TILE ][ EDGE_DISTANCE ][ EDGE_DISTANCE ];
+  gameState.b5 = corners[ -CORNER_DISTANCE ][ CORNER_DISTANCE ][ CORNER_DISTANCE ];
+  gameState.b6 = edges[ -EDGE_DISTANCE ][ EDGE_DISTANCE ][ MID_TILE ];
+  gameState.b7 = edges[ -EDGE_DISTANCE ][ EDGE_DISTANCE ][ -MID_TILE ];
+  gameState.b8 = corners[ -CORNER_DISTANCE ][ CORNER_DISTANCE ][ -CORNER_DISTANCE ];
+  gameState.c1 = faces[ -MID_TILE ][ MID_TILE ][ -RADIUS ];
+  gameState.c2 = faces[ MID_TILE ][ MID_TILE ][ -RADIUS ];
+  gameState.c3 = edges[ EDGE_DISTANCE ][ MID_TILE ][ -EDGE_DISTANCE ];
+  gameState.c4 = faces[ RADIUS ][ -MID_TILE ][ -MID_TILE ];
+  gameState.c5 = faces[ RADIUS ][ MID_TILE ][ MID_TILE ];
+  gameState.c6 = edges[ EDGE_DISTANCE ][ MID_TILE ][ EDGE_DISTANCE ];
+  gameState.c7 = faces[ MID_TILE ][ MID_TILE ][ RADIUS ];
+  gameState.c8 = faces[ -MID_TILE ][ MID_TILE ][ RADIUS ];
+  gameState.d1 = edges[ -EDGE_DISTANCE ][ MID_TILE ][ EDGE_DISTANCE ];
+  gameState.d2 = faces[ -RADIUS ][ MID_TILE ][ MID_TILE ];
+  gameState.d3 = faces[ -RADIUS ][ MID_TILE ][ -MID_TILE ];
+  gameState.d4 = edges[ -EDGE_DISTANCE ][ MID_TILE ][ -EDGE_DISTANCE ];
+  gameState.d5 = faces[ -MID_TILE ][ -MID_TILE ][ -RADIUS ];
+  gameState.d6 = faces[ MID_TILE ][ -MID_TILE ][ -RADIUS ];
+  gameState.d7 = edges[ EDGE_DISTANCE ][ -MID_TILE ][ -EDGE_DISTANCE ];
+  gameState.d8 = faces[ RADIUS ][ -MID_TILE ][ MID_TILE ];
+  gameState.e1 = faces[ RADIUS ][ MID_TILE ][ -MID_TILE ];
+  gameState.e2 = edges[ EDGE_DISTANCE ][ -MID_TILE ][ EDGE_DISTANCE ];
+  gameState.e3 = faces[ MID_TILE ][ -MID_TILE ][ RADIUS ];
+  gameState.e4 = faces[ -MID_TILE ][ -MID_TILE ][ RADIUS ];
+  gameState.e5 = edges[ -EDGE_DISTANCE ][ -MID_TILE ][ EDGE_DISTANCE ];
+  gameState.e6 = faces[ -RADIUS ][ -MID_TILE ][ MID_TILE ];
+  gameState.e7 = faces[ -RADIUS ][ -MID_TILE ][ -MID_TILE ];
+  gameState.e8 = edges[ -EDGE_DISTANCE ][ -MID_TILE ][ -EDGE_DISTANCE ];
+  gameState.f1 = edges[ -MID_TILE ][ -EDGE_DISTANCE ][ -EDGE_DISTANCE ];
+  gameState.f2 = edges[ MID_TILE ][ -EDGE_DISTANCE ][ -EDGE_DISTANCE ];
+  gameState.f3 = corners[ CORNER_DISTANCE ][ -CORNER_DISTANCE ][ -CORNER_DISTANCE ];
+  gameState.f4 = edges[ EDGE_DISTANCE ][ -EDGE_DISTANCE ][ -MID_TILE ];
+  gameState.f5 = edges[ EDGE_DISTANCE ][ -EDGE_DISTANCE ][ MID_TILE ];
+  gameState.f6 = corners[ CORNER_DISTANCE ][ -CORNER_DISTANCE ][ CORNER_DISTANCE ];
+  gameState.f7 = edges[ MID_TILE ][ -EDGE_DISTANCE ][ EDGE_DISTANCE ];
+  gameState.f8 = edges[ -MID_TILE ][ -EDGE_DISTANCE ][ EDGE_DISTANCE ];
+  gameState.g1 = corners[ -CORNER_DISTANCE ][ -CORNER_DISTANCE ][ CORNER_DISTANCE ];
+  gameState.g2 = edges[ -EDGE_DISTANCE ][ -EDGE_DISTANCE ][ MID_TILE ];
+  gameState.g3 = edges[ -EDGE_DISTANCE ][ -EDGE_DISTANCE ][ -MID_TILE ];
+  gameState.g4 = corners[ -CORNER_DISTANCE ][ -CORNER_DISTANCE ][ -CORNER_DISTANCE ];
+  gameState.g5 = faces[ -MID_TILE ][ -RADIUS ][ -MID_TILE ];
+  gameState.g6 = faces[ MID_TILE ][ -RADIUS ][ -MID_TILE ];
+  gameState.g7 = faces[ -MID_TILE ][ -RADIUS ][ MID_TILE ];
+  gameState.g8 = faces[ MID_TILE ][ -RADIUS ][ MID_TILE ];
+
+  // Add edges
+  // TODO: double check these values
+  gameState.a1.addEdge(gameState.b5, gameState.b4, gameState.b3, gameState.a2, gameState.a4, gameState.a3, gameState.b7, gameState.b6);
+  gameState.a2.addEdge(gameState.b4, gameState.b3, gameState.b2, gameState.b1, gameState.a8, gameState.a4, gameState.a3, gameState.a1);
+  gameState.a3.addEdge(gameState.b6, gameState.a1, gameState.a2, gameState.a4, gameState.a6, gameState.a5, gameState.b8, gameState.b7);
+  gameState.a4.addEdge(gameState.a1, gameState.a2, gameState.b1, gameState.a8, gameState.a7, gameState.a6, gameState.a5, gameState.a3);
+  gameState.a5.addEdge(gameState.b7, gameState.a3, gameState.a4, gameState.a6, gameState.c2, gameState.c1, gameState.d4, gameState.b8);
+  gameState.a6.addEdge(gameState.a3, gameState.a4, gameState.a8, gameState.a7, gameState.c3, gameState.c2, gameState.c1, gameState.a5);
+  gameState.a7.addEdge(gameState.a4, gameState.a8, gameState.c4, gameState.c3, gameState.c2, gameState.a6);
+  gameState.a8.addEdge(gameState.a6, gameState.a4, gameState.a2, gameState.b1, gameState.c5, gameState.c4, gameState.c3, gameState.a7);
+  gameState.b1.addEdge(gameState.a4, gameState.a2, gameState.b3, gameState.b2, gameState.c6, gameState.c5, gameState.c4, gameState.a8);
+  gameState.b2.addEdge(gameState.b1, gameState.a2, gameState.b3, gameState.c7, gameState.c6, gameState.c5);
+  gameState.b3.addEdge(gameState.b1, gameState.a2, gameState.a1, gameState.b4, gameState.c8, gameState.c7, gameState.c6, gameState.b2);
+  gameState.b4.addEdge(gameState.a2, gameState.a1, gameState.b6, gameState.b5, gameState.d1, gameState.c8, gameState.c7, gameState.b3);
+  gameState.b5.addEdge(gameState.b4, gameState.a1, gameState.b6, gameState.d2, gameState.d1, gameState.c8);
+  gameState.b6.addEdge(gameState.b4, gameState.a1, gameState.a3, gameState.b7, gameState.d3, gameState.d2, gameState.d1, gameState.b5);
+  gameState.b7.addEdge(gameState.a1, gameState.a3, gameState.a5, gameState.b8, gameState.d4, gameState.d3, gameState.d2, gameState.b6);
+  gameState.b8.addEdge(gameState.b7, gameState.a3, gameState.a5, gameState.c1, gameState.d4, gameState.d3);
+  gameState.c1.addEdge(gameState.b8, gameState.a5, gameState.a6, gameState.c2, gameState.d6, gameState.d5, gameState.e8, gameState.d4);
+  gameState.c2.addEdge(gameState.a5, gameState.a6, gameState.a7, gameState.c3, gameState.d7, gameState.d6, gameState.d5, gameState.c1);
+  gameState.c3.addEdge(gameState.a6, gameState.a7, gameState.a8, gameState.c4, gameState.d8, gameState.d7, gameState.d6, gameState.c2);
+  gameState.c4.addEdge(gameState.a7, gameState.a8, gameState.b1, gameState.c5, gameState.e1, gameState.d8, gameState.d7, gameState.c3);
+  gameState.c5.addEdge(gameState.a8, gameState.b1, gameState.b2, gameState.c6, gameState.e2, gameState.e1, gameState.d8, gameState.c4);
+  gameState.c6.addEdge(gameState.b1, gameState.b2, gameState.b3, gameState.c7, gameState.e3, gameState.e2, gameState.e1, gameState.c5);
+  gameState.c7.addEdge(gameState.b2, gameState.b3, gameState.b4, gameState.e8, gameState.e4, gameState.e3, gameState.e2, gameState.c6);
+  gameState.c8.addEdge(gameState.b3, gameState.b4, gameState.b5, gameState.d1, gameState.e5, gameState.e4, gameState.e3, gameState.c7);
+  gameState.d1.addEdge(gameState.b4, gameState.b5, gameState.b6, gameState.d2, gameState.e6, gameState.e5, gameState.e4, gameState.c8);
+  gameState.d2.addEdge(gameState.b5, gameState.b6, gameState.b7, gameState.d3, gameState.e7, gameState.e6, gameState.e5, gameState.d1);
+  gameState.d3.addEdge(gameState.b6, gameState.b7, gameState.b8, gameState.d4, gameState.e8, gameState.e7, gameState.e6, gameState.d2);
+  gameState.d4.addEdge(gameState.b7, gameState.b8, gameState.a5, gameState.c1, gameState.d5, gameState.e8, gameState.e7, gameState.d3);
+  gameState.d5.addEdge(gameState.d4, gameState.c1, gameState.c2, gameState.d6, gameState.f2, gameState.f1, gameState.g4, gameState.e8);
+  gameState.d6.addEdge(gameState.c1, gameState.c2, gameState.c3, gameState.d7, gameState.f3, gameState.f2, gameState.f1, gameState.d5);
+  gameState.d7.addEdge(gameState.c2, gameState.c3, gameState.c4, gameState.d8, gameState.f4, gameState.f3, gameState.f2, gameState.d6);
+  gameState.d8.addEdge(gameState.c3, gameState.c4, gameState.c5, gameState.e1, gameState.f5, gameState.f4, gameState.f3, gameState.d7);
+  gameState.e1.addEdge(gameState.c4, gameState.c5, gameState.c6, gameState.e2, gameState.f6, gameState.f5, gameState.f4, gameState.d8);
+  gameState.e2.addEdge(gameState.c5, gameState.c6, gameState.c7, gameState.e3, gameState.f7, gameState.f6, gameState.f5, gameState.e1);
+  gameState.e3.addEdge(gameState.c6, gameState.c7, gameState.c8, gameState.e4, gameState.f8, gameState.f7, gameState.f6, gameState.e2);
+  gameState.e4.addEdge(gameState.c7, gameState.c8, gameState.d1, gameState.e5, gameState.g1, gameState.f8, gameState.f7, gameState.e3);
+  gameState.e5.addEdge(gameState.c8, gameState.d1, gameState.d2, gameState.e6, gameState.g2, gameState.g1, gameState.f8, gameState.e4);
+  gameState.e6.addEdge(gameState.d1, gameState.d2, gameState.d3, gameState.e7, gameState.g3, gameState.g2, gameState.g1, gameState.e5);
+  gameState.e7.addEdge(gameState.d2, gameState.d3, gameState.d4, gameState.e8, gameState.g4, gameState.g3, gameState.g2, gameState.e6);
+  gameState.e8.addEdge(gameState.d3, gameState.d4, gameState.c1, gameState.d5, gameState.f1, gameState.g4, gameState.g3, gameState.e7);
+  gameState.f1.addEdge(gameState.e8, gameState.d5, gameState.d6, gameState.f2, gameState.g6, gameState.g5, gameState.g3, gameState.g4);
+  gameState.f2.addEdge(gameState.d5, gameState.d6, gameState.d7, gameState.f3, gameState.f4, gameState.g6, gameState.g5, gameState.f1);
+  gameState.f3.addEdge(gameState.d6, gameState.d7, gameState.d8, gameState.f4, gameState.g6, gameState.f2);
+  gameState.f4.addEdge(gameState.d7, gameState.d8, gameState.e1, gameState.f5, gameState.g8, gameState.g6, gameState.f2, gameState.f3);
+  gameState.f5.addEdge(gameState.d8, gameState.e1, gameState.e2, gameState.f6, gameState.f7, gameState.g8, gameState.g6, gameState.f4);
+  gameState.f6.addEdge(gameState.e1, gameState.e2, gameState.e3, gameState.f7, gameState.f8, gameState.g5);
+  gameState.f7.addEdge(gameState.e2, gameState.e3, gameState.e4, gameState.f8, gameState.g7, gameState.g8, gameState.f5, gameState.f6);
+  gameState.f8.addEdge(gameState.e3, gameState.e4, gameState.e5, gameState.g1, gameState.g2, gameState.g7, gameState.g8, gameState.f7);
+  gameState.g1.addEdge(gameState.e4, gameState.e5, gameState.e6, gameState.g2, gameState.g7, gameState.f8);
+  gameState.g2.addEdge(gameState.e5, gameState.e6, gameState.e7, gameState.g3, gameState.g5, gameState.g7, gameState.f8, gameState.g1);
+  gameState.g3.addEdge(gameState.e6, gameState.e7, gameState.e8, gameState.g4, gameState.f1, gameState.g5, gameState.g7, gameState.g2);
+  gameState.g4.addEdge(gameState.e7, gameState.e8, gameState.d5, gameState.f1, gameState.g5, gameState.g3);
+  gameState.g5.addEdge(gameState.g4, gameState.f1, gameState.f2, gameState.g6, gameState.g8, gameState.g7, gameState.g2, gameState.g3);
+  gameState.g6.addEdge(gameState.f1, gameState.f2, gameState.f3, gameState.f4, gameState.f5, gameState.g8, gameState.g7, gameState.g5);
+  gameState.g7.addEdge(gameState.g3, gameState.g5, gameState.g6, gameState.g8, gameState.f7, gameState.f8, gameState.g1, gameState.g2);
+  gameState.g8.addEdge(gameState.g5, gameState.g6, gameState.f4, gameState.f5, gameState.f6, gameState.f7, gameState.f8, gameState.g7);
 
   /*
   ========================================
@@ -62,14 +188,12 @@ function initGame() {
    */
   var geometry, mesh;
 
-  gameState.faces = allCombos([a, a, b], new Tile());
-
-  for(var x in gameState.faces) {
-    for(var y in gameState.faces[x]) {
-      for(var z in gameState.faces[x][y]) {
-        if(Math.abs(x) == b) {
+  for(var x in faces) {
+    for(var y in faces[x]) {
+      for(var z in faces[x][y]) {
+        if(Math.abs(x) == RADIUS) {
           geometry = xFace;
-        } else if(Math.abs(y) == b) {
+        } else if(Math.abs(y) == RADIUS) {
           geometry = yFace;
         } else {
           geometry = zFace;
@@ -79,20 +203,17 @@ function initGame() {
         mesh.position.set(x, y, z);
 
         board.add( mesh );
-
-        // scene.add( gameState.faces[x][y][z] );
       }
     }
   }
 
-  gameState.edges = allCombos([c, c, a], new Tile());
 
-  for(var x in gameState.edges) {
-    for(var y in gameState.edges[x]) {
-      for(var z in gameState.edges[x][y]) {
-        if(Math.abs(x) == a) {
+  var for(var x in edges) {
+    var for(var y in edges[x]) {
+      var for(var z in edges[x][y]) {
+        if(Math.abs(x) == MID_TILE) {
           geometry = y * z < 0 ? nxEdge : pxEdge;
-        } else if(Math.abs(y) == a) {
+        } else if(Math.abs(y) == MID_TILE) {
           geometry = x * z < 0 ? nyEdge : pyEdge;
         } else {
           geometry = x * y < 0 ? nzEdge : pzEdge;
@@ -106,12 +227,11 @@ function initGame() {
     }
   }
 
-  gameState.corners = allCombos([d, d, d], new Tile());
 
-  for(var x in gameState.corners) {
-    for(var y in gameState.corners[x]) {
-      for(var z in gameState.corners[x][y]) {
-        gameState.corners[x][y][z].isCorner = true;
+  var for(var x in corners) {
+    var for(var y in corners[x]) {
+      var for(var z in corners[x][y]) {
+        var corners[x][y][z].isCorner = true;
 
         mesh = new THREE.Mesh( corner, new THREE.MeshLambertMaterial(material) );
         mesh.position.set(x, y, z);
@@ -158,24 +278,44 @@ function allCombos(remaining, init) {
 ========================================
  */
 
-function Tile() {
+/**
+ * Constructor for individual surface of board. Has relationships with other Tiles.
+ * Relationships are defined where upper and lowercase of the same letter are opposite.
+ * @param {Boolean} isCorner - Whether or not constructed Tile is a corner
+ */
+function Tile(isCorner) {
   this.ownedBy = null;
-  this.isCorner = false;
-  this.A = null; // up
-  this.a = null; // down
-  this.B = null; // up right
-  this.b = null; // down left
-  this.C = null; // right
-  this.c = null; // left
-  this.D = null; // down right
-  this.d = null; // up left
+  this.isCorner = !!isCorner;
+  this.edges = [
+    [null, null, null],
+    [null, null, null],
+    [null, null, null]
+  ]
 }
 
 /**
  * Direction in which to check for tiles for capture
- * @param  {char} direction direction to traverse
- * @return {num}            number of pieces captured
+ * @param  {Character} direction direction to traverse
+ * @return {Number}            number of pieces captured
  */
 Tile.prototype.traverse = function(direction) {
 
+}
+
+
+Tile.prototype.addEdges = function(a, b, c, d, e, f, g, h) {
+  if(this.isCorner) {
+    this.edges = [
+      [a, b, c],
+      [null, null, null],
+      [f, e, d]
+    ]
+  }
+  else {
+    his.edges = [
+      [a, b, c],
+      [h, null, d],
+      [g, f, e]
+    ]
+  }
 }
