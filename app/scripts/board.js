@@ -34,6 +34,9 @@ function initGame() {
   var edges = allCombos([EDGE_DISTANCE, EDGE_DISTANCE, MID_TILE], new Tile());
   var corners = allCombos([CORNER_DISTANCE, CORNER_DISTANCE, CORNER_DISTANCE], new Tile());
 
+  var superBoard = deepExtend(faces, edges, corners);
+
+  // TODO: Make tiles and state 1:1 by migrating faces/edges/corners to singular board.
   gameState.a1 = faces[ -MID_TILE ][ RADIUS ][ MID_TILE ];
   gameState.a2 = faces[ MID_TILE ][ RADIUS ][ MID_TILE ];
   gameState.a3 = faces[ -MID_TILE ][ RADIUS ][ -MID_TILE ];
@@ -208,9 +211,9 @@ function initGame() {
   }
 
 
-  var for(var x in edges) {
-    var for(var y in edges[x]) {
-      var for(var z in edges[x][y]) {
+  for(var x in edges) {
+    for(var y in edges[x]) {
+      for(var z in edges[x][y]) {
         if(Math.abs(x) == MID_TILE) {
           geometry = y * z < 0 ? nxEdge : pxEdge;
         } else if(Math.abs(y) == MID_TILE) {
@@ -228,10 +231,10 @@ function initGame() {
   }
 
 
-  var for(var x in corners) {
-    var for(var y in corners[x]) {
-      var for(var z in corners[x][y]) {
-        var corners[x][y][z].isCorner = true;
+  for(var x in corners) {
+    for(var y in corners[x]) {
+      for(var z in corners[x][y]) {
+        corners[x][y][z].isCorner = true;
 
         mesh = new THREE.Mesh( corner, new THREE.MeshLambertMaterial(material) );
         mesh.position.set(x, y, z);
@@ -272,6 +275,25 @@ function allCombos(remaining, init) {
   return objSoFar;
 }
 
+function deepExtend(target, source) {
+  var sources = Array.prototype.slice.call(arguments, 1);
+
+  for(var i = 0; i < sources.length; i++) {
+    for(var key in sources[i]) {
+      if(target.hasOwnProperty(key) && typeof sources[i][key] === 'object') {
+        deepExtend(target[key], sources[i][key]);
+      }
+      else {
+        target[key] = sources[i][key];
+      }
+    }
+  }
+
+  return target;
+}
+
+
+
 /*
 ========================================
     Graph Nodes (board tiles)
@@ -286,11 +308,6 @@ function allCombos(remaining, init) {
 function Tile(isCorner) {
   this.ownedBy = null;
   this.isCorner = !!isCorner;
-  this.edges = [
-    [null, null, null],
-    [null, null, null],
-    [null, null, null]
-  ]
 }
 
 /**
@@ -303,19 +320,7 @@ Tile.prototype.traverse = function(direction) {
 }
 
 
-Tile.prototype.addEdges = function(a, b, c, d, e, f, g, h) {
-  if(this.isCorner) {
-    this.edges = [
-      [a, b, c],
-      [null, null, null],
-      [f, e, d]
-    ]
-  }
-  else {
-    his.edges = [
-      [a, b, c],
-      [h, null, d],
-      [g, f, e]
-    ]
-  }
+Tile.prototype.addEdge = function() {
+  var end = this.isCorner ? 6 : 8;
+  this.edges = Array.prototype.slice.call(arguments, 0, end);
 }
