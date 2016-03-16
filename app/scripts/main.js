@@ -172,6 +172,10 @@
     if(focus) {
       focus.currentHex = PLAYER_COLORS[playerTurn];
       playerTurn = 1 - playerTurn;
+      console.log(focus.userData.stateVar);
+      console.log(gameState[focus.userData.stateVar].edges.reduce(function(memo, val, i) {
+        return memo + (i ? ', ' : '') + val.coord;
+      }, ''));
     }
     else {
       console.log('no tile selected');

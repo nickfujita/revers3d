@@ -34,7 +34,7 @@ function initGame() {
   var edges = allCombos([EDGE_DISTANCE, EDGE_DISTANCE, MID_TILE], new Tile());
   var corners = allCombos([CORNER_DISTANCE, CORNER_DISTANCE, CORNER_DISTANCE], new Tile());
 
-  var superBoard = deepExtend(faces, edges, corners);
+  // var superBoard = deepExtend({}, faces, edges, corners);
 
   // TODO: Make tiles and state 1:1 by migrating faces/edges/corners to singular board.
   gameState.a1 = faces[ -MID_TILE ][ RADIUS ][ MID_TILE ];
@@ -93,6 +93,10 @@ function initGame() {
   gameState.g6 = faces[ MID_TILE ][ -RADIUS ][ -MID_TILE ];
   gameState.g7 = faces[ -MID_TILE ][ -RADIUS ][ MID_TILE ];
   gameState.g8 = faces[ MID_TILE ][ -RADIUS ][ MID_TILE ];
+
+  for(var prop in gameState) {
+    gameState[prop]["coord"] = prop;
+  }
 
   // Add edges
   // TODO: double check these values
@@ -153,6 +157,10 @@ function initGame() {
   gameState.g7.addEdge(gameState.g3, gameState.g5, gameState.g6, gameState.g8, gameState.f7, gameState.f8, gameState.g1, gameState.g2);
   gameState.g8.addEdge(gameState.g5, gameState.g6, gameState.f4, gameState.f5, gameState.f6, gameState.f7, gameState.f8, gameState.g7);
 
+  // console.log(faces);
+
+  // console.log('faces[ -MID_TILE ][ RADIUS ][ MID_TILE ].edges:', faces[ -MID_TILE ][ RADIUS ][ MID_TILE ].edges);
+
   /*
   ========================================
       Tile Geometries
@@ -204,12 +212,12 @@ function initGame() {
 
         mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial(material) );
         mesh.position.set(x, y, z);
+        mesh.userData = { stateVar: faces[x][y][z].coord };
 
         board.add( mesh );
       }
     }
   }
-
 
   for(var x in edges) {
     for(var y in edges[x]) {
@@ -224,6 +232,8 @@ function initGame() {
 
         mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial(material) );
         mesh.position.set(x, y, z);
+        mesh.userData = { stateVar: edges[x][y][z].coord };
+
 
         board.add( mesh );
       }
@@ -238,6 +248,7 @@ function initGame() {
 
         mesh = new THREE.Mesh( corner, new THREE.MeshLambertMaterial(material) );
         mesh.position.set(x, y, z);
+        mesh.userData = { stateVar: corners[x][y][z].coord };
         mesh.lookAt( CENTER_OF_THE_UNIVERSE );
 
         if(Math.sign(y) < 0){
@@ -263,9 +274,8 @@ function allCombos(remaining, init) {
 
   if(remaining.length) {
     for(var i = 0; i < remaining.length; i++) {
-      var r = allCombos(remaining.slice(0, i).concat(remaining.slice(i+1)), init);
-      objSoFar[remaining[i]] = r;
-      objSoFar[-remaining[i]] = r;
+      objSoFar[remaining[i]] = deepExtend({}, allCombos(remaining.slice(0, i).concat(remaining.slice(i+1)), init));
+      objSoFar[-remaining[i]] = deepExtend({}, allCombos(remaining.slice(0, i).concat(remaining.slice(i+1)), init));
     }
   }
   else {
@@ -275,7 +285,7 @@ function allCombos(remaining, init) {
   return objSoFar;
 }
 
-function deepExtend(target, source) {
+function deepExtend(target) {
   var sources = Array.prototype.slice.call(arguments, 1);
 
   for(var i = 0; i < sources.length; i++) {
@@ -306,6 +316,7 @@ function deepExtend(target, source) {
  * @param {Boolean} isCorner - Whether or not constructed Tile is a corner
  */
 function Tile(isCorner) {
+  this.constructor = Tile;
   this.ownedBy = null;
   this.isCorner = !!isCorner;
 }
