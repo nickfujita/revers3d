@@ -106,9 +106,9 @@ function initGame() {
   gameState.a4.addEdge(gameState.a1, gameState.a2, gameState.b1, gameState.a8, gameState.a7, gameState.a6, gameState.a5, gameState.a3);
   gameState.a5.addEdge(gameState.b7, gameState.a3, gameState.a4, gameState.a6, gameState.c2, gameState.c1, gameState.d4, gameState.b8);
   gameState.a6.addEdge(gameState.a3, gameState.a4, gameState.a8, gameState.a7, gameState.c3, gameState.c2, gameState.c1, gameState.a5);
-  gameState.a7.addEdge(gameState.a4, gameState.a8, gameState.c4, gameState.c3, gameState.c2, gameState.a6);
-  gameState.a8.addEdge(gameState.a6, gameState.a4, gameState.a2, gameState.b1, gameState.c5, gameState.c4, gameState.c3, gameState.a7);
-  gameState.b1.addEdge(gameState.a4, gameState.a2, gameState.b3, gameState.b2, gameState.c6, gameState.c5, gameState.c4, gameState.a8);
+  gameState.a7.addEdge(gameState.a6, gameState.a4, gameState.a8, gameState.e1, gameState.c3, gameState.c2);
+  gameState.a8.addEdge(gameState.a6, gameState.a4, gameState.a2, gameState.b1, gameState.c5, gameState.e1, gameState.c3, gameState.a7);
+  gameState.b1.addEdge(gameState.a4, gameState.a2, gameState.b3, gameState.b2, gameState.c6, gameState.c5, gameState.e1, gameState.a8);
   gameState.b2.addEdge(gameState.b1, gameState.a2, gameState.b3, gameState.c7, gameState.c6, gameState.c5);
   gameState.b3.addEdge(gameState.b1, gameState.a2, gameState.a1, gameState.b4, gameState.c8, gameState.c7, gameState.c6, gameState.b2);
   gameState.b4.addEdge(gameState.a2, gameState.a1, gameState.b6, gameState.b5, gameState.d1, gameState.c8, gameState.c7, gameState.b3);
@@ -118,11 +118,11 @@ function initGame() {
   gameState.b8.addEdge(gameState.b7, gameState.a3, gameState.a5, gameState.c1, gameState.d4, gameState.d3);
   gameState.c1.addEdge(gameState.b8, gameState.a5, gameState.a6, gameState.c2, gameState.d6, gameState.d5, gameState.e8, gameState.d4);
   gameState.c2.addEdge(gameState.a5, gameState.a6, gameState.a7, gameState.c3, gameState.d7, gameState.d6, gameState.d5, gameState.c1);
-  gameState.c3.addEdge(gameState.a6, gameState.a7, gameState.a8, gameState.c4, gameState.d8, gameState.d7, gameState.d6, gameState.c2);
-  gameState.c4.addEdge(gameState.a7, gameState.a8, gameState.b1, gameState.c5, gameState.e1, gameState.d8, gameState.d7, gameState.c3);
+  gameState.c3.addEdge(gameState.a6, gameState.a7, gameState.a8, gameState.e1, gameState.c4, gameState.d7, gameState.d6, gameState.c2);
+  gameState.c4.addEdge(gameState.c3, gameState.e1, gameState.c5, gameState.d8, gameState.f5, gameState.f4, gameState.f3, gameState.d7);
   gameState.c5.addEdge(gameState.a8, gameState.b1, gameState.b2, gameState.c6, gameState.e2, gameState.e1, gameState.d8, gameState.c4);
-  gameState.c6.addEdge(gameState.b1, gameState.b2, gameState.b3, gameState.c7, gameState.e3, gameState.e2, gameState.e1, gameState.c5);
-  gameState.c7.addEdge(gameState.b2, gameState.b3, gameState.b4, gameState.e8, gameState.e4, gameState.e3, gameState.e2, gameState.c6);
+  gameState.c6.addEdge(gameState.b1, gameState.b2, gameState.b3, gameState.c7, gameState.e3, gameState.e2, gameState.d8, gameState.c5);
+  gameState.c7.addEdge(gameState.b2, gameState.b3, gameState.b4, gameState.c8, gameState.e4, gameState.e3, gameState.e2, gameState.c6);
   gameState.c8.addEdge(gameState.b3, gameState.b4, gameState.b5, gameState.d1, gameState.e5, gameState.e4, gameState.e3, gameState.c7);
   gameState.d1.addEdge(gameState.b4, gameState.b5, gameState.b6, gameState.d2, gameState.e6, gameState.e5, gameState.e4, gameState.c8);
   gameState.d2.addEdge(gameState.b5, gameState.b6, gameState.b7, gameState.d3, gameState.e7, gameState.e6, gameState.e5, gameState.d1);
@@ -130,10 +130,10 @@ function initGame() {
   gameState.d4.addEdge(gameState.b7, gameState.b8, gameState.a5, gameState.c1, gameState.d5, gameState.e8, gameState.e7, gameState.d3);
   gameState.d5.addEdge(gameState.d4, gameState.c1, gameState.c2, gameState.d6, gameState.f2, gameState.f1, gameState.g4, gameState.e8);
   gameState.d6.addEdge(gameState.c1, gameState.c2, gameState.c3, gameState.d7, gameState.f3, gameState.f2, gameState.f1, gameState.d5);
-  gameState.d7.addEdge(gameState.c2, gameState.c3, gameState.c4, gameState.d8, gameState.f4, gameState.f3, gameState.f2, gameState.d6);
-  gameState.d8.addEdge(gameState.c3, gameState.c4, gameState.c5, gameState.e1, gameState.f5, gameState.f4, gameState.f3, gameState.d7);
-  gameState.e1.addEdge(gameState.c4, gameState.c5, gameState.c6, gameState.e2, gameState.f6, gameState.f5, gameState.f4, gameState.d8);
-  gameState.e2.addEdge(gameState.c5, gameState.c6, gameState.c7, gameState.e3, gameState.f7, gameState.f6, gameState.f5, gameState.e1);
+  gameState.d7.addEdge(gameState.c2, gameState.c3, gameState.e1, gameState.c4, gameState.f4, gameState.f3, gameState.f2, gameState.d6);
+  gameState.d8.addEdge(gameState.e1, gameState.c5, gameState.c6, gameState.e2, gameState.f6, gameState.f5, gameState.f4, gameState.c4);
+  gameState.e1.addEdge(gameState.a7, gameState.a8, gameState.b1, gameState.c5, gameState.d8, gameState.c4, gameState.d7, gameState.c3);
+  gameState.e2.addEdge(gameState.c5, gameState.c6, gameState.c7, gameState.e3, gameState.f7, gameState.f6, gameState.f5, gameState.d8);
   gameState.e3.addEdge(gameState.c6, gameState.c7, gameState.c8, gameState.e4, gameState.f8, gameState.f7, gameState.f6, gameState.e2);
   gameState.e4.addEdge(gameState.c7, gameState.c8, gameState.d1, gameState.e5, gameState.g1, gameState.f8, gameState.f7, gameState.e3);
   gameState.e5.addEdge(gameState.c8, gameState.d1, gameState.d2, gameState.e6, gameState.g2, gameState.g1, gameState.f8, gameState.e4);
@@ -142,10 +142,10 @@ function initGame() {
   gameState.e8.addEdge(gameState.d3, gameState.d4, gameState.c1, gameState.d5, gameState.f1, gameState.g4, gameState.g3, gameState.e7);
   gameState.f1.addEdge(gameState.e8, gameState.d5, gameState.d6, gameState.f2, gameState.g6, gameState.g5, gameState.g3, gameState.g4);
   gameState.f2.addEdge(gameState.d5, gameState.d6, gameState.d7, gameState.f3, gameState.f4, gameState.g6, gameState.g5, gameState.f1);
-  gameState.f3.addEdge(gameState.d6, gameState.d7, gameState.d8, gameState.f4, gameState.g6, gameState.f2);
-  gameState.f4.addEdge(gameState.d7, gameState.d8, gameState.e1, gameState.f5, gameState.g8, gameState.g6, gameState.f2, gameState.f3);
-  gameState.f5.addEdge(gameState.d8, gameState.e1, gameState.e2, gameState.f6, gameState.f7, gameState.g8, gameState.g6, gameState.f4);
-  gameState.f6.addEdge(gameState.e1, gameState.e2, gameState.e3, gameState.f7, gameState.f8, gameState.g5);
+  gameState.f3.addEdge(gameState.d6, gameState.d7, gameState.c4, gameState.f4, gameState.g6, gameState.f2);
+  gameState.f4.addEdge(gameState.d7, gameState.c4, gameState.d8, gameState.f5, gameState.g8, gameState.g6, gameState.f2, gameState.f3);
+  gameState.f5.addEdge(gameState.c4, gameState.d8, gameState.e2, gameState.f6, gameState.f7, gameState.g8, gameState.g6, gameState.f4);
+  gameState.f6.addEdge(gameState.d8, gameState.e2, gameState.e3, gameState.f7, gameState.g8, gameState.f5);
   gameState.f7.addEdge(gameState.e2, gameState.e3, gameState.e4, gameState.f8, gameState.g7, gameState.g8, gameState.f5, gameState.f6);
   gameState.f8.addEdge(gameState.e3, gameState.e4, gameState.e5, gameState.g1, gameState.g2, gameState.g7, gameState.g8, gameState.f7);
   gameState.g1.addEdge(gameState.e4, gameState.e5, gameState.e6, gameState.g2, gameState.g7, gameState.f8);
@@ -210,11 +210,11 @@ function initGame() {
           geometry = zFace;
         }
 
-        mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial(material) );
-        mesh.position.set(x, y, z);
-        mesh.userData = { stateVar: faces[x][y][z].coord };
+        faces[x][y][z].mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial(material) );
+        faces[x][y][z].mesh.position.set(x, y, z);
+        faces[x][y][z].mesh.userData = { stateVar: faces[x][y][z].coord };
 
-        board.add( mesh );
+        board.add( faces[x][y][z].mesh );
       }
     }
   }
@@ -230,12 +230,12 @@ function initGame() {
           geometry = x * y < 0 ? nzEdge : pzEdge;
         }
 
-        mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial(material) );
-        mesh.position.set(x, y, z);
-        mesh.userData = { stateVar: edges[x][y][z].coord };
+        edges[x][y][z].mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial(material) );
+        edges[x][y][z].mesh.position.set(x, y, z);
+        edges[x][y][z].mesh.userData = { stateVar: edges[x][y][z].coord };
 
 
-        board.add( mesh );
+        board.add( edges[x][y][z].mesh );
       }
     }
   }
@@ -246,16 +246,16 @@ function initGame() {
       for(var z in corners[x][y]) {
         corners[x][y][z].isCorner = true;
 
-        mesh = new THREE.Mesh( corner, new THREE.MeshLambertMaterial(material) );
-        mesh.position.set(x, y, z);
-        mesh.userData = { stateVar: corners[x][y][z].coord };
-        mesh.lookAt( CENTER_OF_THE_UNIVERSE );
+        corners[x][y][z].mesh = new THREE.Mesh( corner, new THREE.MeshLambertMaterial(material) );
+        corners[x][y][z].mesh.position.set(x, y, z);
+        corners[x][y][z].mesh.userData = { stateVar: corners[x][y][z].coord };
+        corners[x][y][z].mesh.lookAt( CENTER_OF_THE_UNIVERSE );
 
         if(Math.sign(y) < 0){
-          mesh.rotateZ( Math.PI / 3 );
+          corners[x][y][z].mesh.rotateZ( Math.PI / 3 );
         }
 
-        board.add( mesh );
+        board.add( corners[x][y][z].mesh );
       }
     }
   }

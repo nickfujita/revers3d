@@ -170,12 +170,13 @@
     event.stopPropagation();
 
     if(focus) {
-      focus.currentHex = PLAYER_COLORS[playerTurn];
-      playerTurn = 1 - playerTurn;
+      // focus.currentHex = PLAYER_COLORS[playerTurn];
+      // playerTurn = 1 - playerTurn;
       console.log(focus.userData.stateVar);
-      console.log(gameState[focus.userData.stateVar].edges.reduce(function(memo, val, i) {
-        return memo + (i ? ', ' : '') + val.coord;
-      }, ''));
+      // console.log(gameState[focus.userData.stateVar].edges);
+      // console.log(gameState[focus.userData.stateVar].edges.reduce(function(memo, val, i) {
+      //   return memo + (i ? ', ' : '') + val.coord;
+      // }, ''));
     }
     else {
       console.log('no tile selected');
@@ -323,18 +324,27 @@
     // calculate board tiles intersecting the picking ray
     intersects = sightline.intersectObjects( board.children );
 
-    if ( intersects.length > 0 ) {
-      if ( focus != intersects[ 0 ].object ) {
-        if ( focus ) focus.material.emissive.setHex( focus.currentHex );
-        // Save previous properties of intersected object to restore its properties on blur
-        focus = intersects[ 0 ].object;
-        focus.currentHex = focus.material.emissive.getHex();
-        focus.material.emissive.setHex( PLAYER_COLORS[playerTurn] );
+    if ( intersects.length > 0 ) { // on focus
+      if ( focus != intersects[ 0 ].object ) { // if focus is on a new object
+        if ( focus ) focus.material.emissive.setHex( focus.currentHex ); // restore color to old object
+
+        focus = intersects[ 0 ].object; // Set focus to new object
+        focus.currentHex = focus.material.emissive.getHex(); // remember focused elements color
+        focus.material.emissive.setHex( PLAYER_COLORS[playerTurn] ); // set focused element to new color
+
+        gameState[focus.userData.stateVar].edges.forEach(function(edge) {
+          edge.mesh.material.emissive.setHex(0x7fff00);
+        })
       }
     } else {
-      if(focus) {
+      if(focus) { // on blur
         // Restore previous properties of intersection
         if ( focus ) focus.material.emissive.setHex( focus.currentHex );
+
+        gameState[focus.userData.stateVar].edges.forEach(function(edge) {
+          edge.mesh.material.emissive.setHex(0x000000);
+        })
+
         focus = null;
       }
     }
