@@ -4,9 +4,9 @@
       Game vars
   ========================================
    */
-  window.board = {
-    color: 0x999999,
-  }
+  // window.board = {
+  //   color: 0x999999,
+  // }
 
   var PLAYER_COLORS = [0xff0000, 0x1e09ff];
 
@@ -80,8 +80,8 @@
   ========================================
    */
 
-  window.socket = io('http://localhost:3030');
-  initBoard();
+  window.socket = io(window.location.host);
+  initGame();
   var prevTime = performance.now();
 
 
@@ -97,6 +97,8 @@
   var moveBackward = false;
   var moveLeft = false;
   var moveRight = false;
+  var moveUp = false;
+  var moveDown = false;
 
   // Set sight ray
   var focus, intersects;
@@ -124,14 +126,18 @@
       var delta = ( time - prevTime ) / 1000;
 
       velocity.x -= velocity.x * 10.0 * delta;
+      velocity.y -= velocity.y * 10.0 * delta;
       velocity.z -= velocity.z * 10.0 * delta;
 
       if ( moveForward ) velocity.z -= 400.0 * delta;
       if ( moveBackward ) velocity.z += 400.0 * delta;
       if ( moveLeft ) velocity.x -= 400.0 * delta;
       if ( moveRight ) velocity.x += 400.0 * delta;
+      if ( moveUp ) velocity.y += 400.0 * delta;
+      if ( moveDown ) velocity.y -= 400.0 * delta;
 
       controls.getObject().translateX( velocity.x * delta );
+      controls.getObject().translateY( velocity.y * delta );
       controls.getObject().translateZ( velocity.z * delta );
 
       prevTime = time;
@@ -152,20 +158,6 @@
       Event Handlers
   ========================================
    */
-  // function setOrientationControls(e) {
-  //   if (!e.alpha) {
-  //     return;
-  //   }
-
-  //   controls = new THREE.DeviceOrientationControls(camera, true);
-  //   controls.connect();
-  //   controls.update();
-  //   element.addEventListener('click', fullscreen, false);
-
-  //   window.removeEventListener('deviceorientation', setOrientationControls, true);
-  // }
-
-
 
   function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -177,9 +169,14 @@
   function onClick( event ) {
     event.stopPropagation();
 
-    if(INTERSECTED) {
-      INTERSECTED.currentHex = PLAYER_COLORS[playerTurn];
-      playerTurn = 1 - playerTurn;
+    if(focus) {
+      // focus.currentHex = PLAYER_COLORS[playerTurn];
+      // playerTurn = 1 - playerTurn;
+      console.log(focus.userData.stateVar);
+      // console.log(gameState[focus.userData.stateVar].edges);
+      // console.log(gameState[focus.userData.stateVar].edges.reduce(function(memo, val, i) {
+      //   return memo + (i ? ', ' : '') + val.coord;
+      // }, ''));
     }
     else {
       console.log('no tile selected');
@@ -195,7 +192,8 @@
 
       case 37: // left
       case 65: // a
-        moveLeft = true; break;
+        moveLeft = true;
+        break;
 
       case 40: // down
       case 83: // s
@@ -208,8 +206,11 @@
         break;
 
       case 32: // space
-        if ( canJump === true ) velocity.y += 350;
-        canJump = false;
+        moveUp = true;
+        break;
+
+      case 16: // shift
+        moveDown = true;
         break;
     }
   };
@@ -234,6 +235,14 @@
       case 39: // right
       case 68: // d
         moveRight = false;
+        break;
+
+      case 32: // space
+        moveUp = false;
+        break;
+
+      case 16: // shift
+        moveDown = false;
         break;
 
       case 70: // f
@@ -313,20 +322,29 @@
     sightline.setFromCamera( mouse, camera );
 
     // calculate board tiles intersecting the picking ray
-    intersects = sightline.intersectObjects( scene.children );
+    intersects = sightline.intersectObjects( board.children );
 
-    if ( intersects.length > 0 ) {
-      if ( focus != intersects[ 0 ].object ) {
-        if ( focus ) focus.material.emissive.setHex( focus.currentHex );
-        // Save previous properties of intersected object to restore its properties on blur
-        focus = intersects[ 0 ].object;
-        focus.currentHex = focus.material.emissive.getHex();
-        focus.material.emissive.setHex( PLAYER_COLORS[playerTurn] );
+    if ( intersects.length > 0 ) { // on focus
+      if ( focus != intersects[ 0 ].object ) { // if focus is on a new object
+        if ( focus ) focus.material.emissive.setHex( focus.currentHex ); // restore color to old object
+
+        focus = intersects[ 0 ].object; // Set focus to new object
+        focus.currentHex = focus.material.emissive.getHex(); // remember focused elements color
+        focus.material.emissive.setHex( PLAYER_COLORS[playerTurn] ); // set focused element to new color
+
+        gameState[focus.userData.stateVar].edges.forEach(function(edge) {
+          edge.mesh.material.emissive.setHex(0x7fff00);
+        })
       }
     } else {
-      if(focus) {
+      if(focus) { // on blur
         // Restore previous properties of intersection
         if ( focus ) focus.material.emissive.setHex( focus.currentHex );
+
+        gameState[focus.userData.stateVar].edges.forEach(function(edge) {
+          edge.mesh.material.emissive.setHex(0x000000);
+        })
+
         focus = null;
       }
     }
