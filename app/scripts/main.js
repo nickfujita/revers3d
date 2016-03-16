@@ -326,24 +326,24 @@
 
     if ( intersects.length > 0 ) { // on focus
       if ( focus != intersects[ 0 ].object ) { // if focus is on a new object
-        if ( focus ) focus.material.emissive.setHex( focus.currentHex ); // restore color to old object
+        // if ( focus ) focus.material.emissive.setHex( focus.currentHex ); // restore color to old object
 
         focus = intersects[ 0 ].object; // Set focus to new object
-        focus.currentHex = focus.material.emissive.getHex(); // remember focused elements color
-        focus.material.emissive.setHex( PLAYER_COLORS[playerTurn] ); // set focused element to new color
+        // focus.currentHex = focus.material.emissive.getHex(); // remember focused elements color
+        // focus.material.emissive.setHex( PLAYER_COLORS[playerTurn] ); // set focused element to new color
 
-        gameState[focus.userData.stateVar].edges.forEach(function(edge) {
-          edge.mesh.material.emissive.setHex(0x7fff00);
-        })
+        // gameState[focus.userData.stateVar].edges.forEach(function(edge) {
+        //   edge.mesh.material.emissive.setHex(0x7fff00);
+        // })
       }
     } else {
       if(focus) { // on blur
         // Restore previous properties of intersection
-        if ( focus ) focus.material.emissive.setHex( focus.currentHex );
+        // if ( focus ) focus.material.emissive.setHex( focus.currentHex );
 
-        gameState[focus.userData.stateVar].edges.forEach(function(edge) {
-          edge.mesh.material.emissive.setHex(0x000000);
-        })
+        // gameState[focus.userData.stateVar].edges.forEach(function(edge) {
+        //   edge.mesh.material.emissive.setHex(0x000000);
+        // })
 
         focus = null;
       }
