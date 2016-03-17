@@ -19,6 +19,7 @@
     "tests"
   ],
   "dependencies": {
-    "three.js": "threejs#*"
+    "three.js": "threejs#*",
+    "stats.js": "*"
   }
 }
