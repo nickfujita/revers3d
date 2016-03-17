@@ -61,6 +61,7 @@
     screenButton.addEventListener( 'click', toggleFullScreen.bind(null, enterVR, exitVR), false );
 
     window.controls = new THREE.DeviceOrientationControls(camera, true);
+
     var stereo = new THREE.StereoEffect(mono);
 
     instructions.style.display = 'none';
@@ -72,6 +73,7 @@
   else {
     enablePointerLock();
     window.controls = new THREE.PointerLockControls( camera );
+    controls.getObject().position.y = 0;
     scene.add( controls.getObject() );
 
     render = mono.render.bind( mono, scene, camera );
