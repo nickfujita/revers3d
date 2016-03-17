@@ -31,3 +31,11 @@ function deepExtend(target, source) {
 
   return target;
 }
+
+var prev = gameState.f1;
+
+for(var i = 0, tile = gameState.d6; i < 9; i++){
+  var current = tile;
+  tile = tile.traverse(prev, tile.capture.bind(tile, 0, {color:0xff0000}));
+  prev = current;
+}

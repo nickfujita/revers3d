@@ -212,7 +212,7 @@ function initGame() {
 
         faces[x][y][z].mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial(material) );
         faces[x][y][z].mesh.position.set(x, y, z);
-        faces[x][y][z].mesh.userData = { stateVar: faces[x][y][z].coord };
+        faces[x][y][z].mesh.userData = { coord: faces[x][y][z].coord };
 
         board.add( faces[x][y][z].mesh );
       }
@@ -232,7 +232,7 @@ function initGame() {
 
         edges[x][y][z].mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial(material) );
         edges[x][y][z].mesh.position.set(x, y, z);
-        edges[x][y][z].mesh.userData = { stateVar: edges[x][y][z].coord };
+        edges[x][y][z].mesh.userData = { coord: edges[x][y][z].coord };
 
 
         board.add( edges[x][y][z].mesh );
@@ -248,7 +248,7 @@ function initGame() {
 
         corners[x][y][z].mesh = new THREE.Mesh( corner, new THREE.MeshLambertMaterial(material) );
         corners[x][y][z].mesh.position.set(x, y, z);
-        corners[x][y][z].mesh.userData = { stateVar: corners[x][y][z].coord };
+        corners[x][y][z].mesh.userData = { coord: corners[x][y][z].coord };
         corners[x][y][z].mesh.lookAt( CENTER_OF_THE_UNIVERSE );
 
         if(Math.sign(y) < 0){
@@ -326,12 +326,36 @@ function Tile(isCorner) {
  * @param  {Character} direction direction to traverse
  * @return {Number}            number of pieces captured
  */
-Tile.prototype.traverse = function(direction) {
+Tile.prototype.traverse = function(fromTile, callback) {
+  var toIndex = (this.edges.indexOf(fromTile) + (1/2 * this.edges.length)) % this.edges.length;
 
+  callback(this);
+
+  // console.log(this.edges[toIndex]);
+
+  return this.edges[toIndex];
 }
 
 
 Tile.prototype.addEdge = function() {
   var end = this.isCorner ? 6 : 8;
   this.edges = Array.prototype.slice.call(arguments, 0, end);
+}
+
+Tile.prototype.light = function(color) {
+  color = color || 0x7fff00;
+
+    this.previousColor = this.mesh.material.emissive.getHex();
+    this.mesh.material.emissive.setHex(color);
+}
+
+Tile.prototype.unlight = function(color) {
+  color = color || 0x7fff00;
+
+  this.mesh.material.emissive.setHex(this.previousColor);
+}
+
+Tile.prototype.capture = function(playerNum, playerObj) {
+  this.ownedBy = playerNum;
+  this.light(playerObj.color);
 }
