@@ -12,11 +12,13 @@ function initGame() {
   var CENTER_OF_THE_UNIVERSE = new THREE.Vector3( 0, 0, 0 );
 
   // Tile coords
+  /*
+  face = [MID_TILE, MID_TILE, RADIUS]
+  edge = [EDGE_DISTANCE, EDGE_DISTANCE, MID_TILE]
+  corner = [CORNER_DISTANCE, CORNER_DISTANCE, CORNER_DISTANCE]
+  */
   var EDGE_LENGTH = TILE_SIZE * Math.sin( Math.PI / 4 );
   var LEG_LENGTH = TILE_SIZE * Math.sin( Math.PI / 4 );
-  // face = aab
-  // edge = cca
-  // corner = ddd
   var MID_TILE = 1/2 * TILE_SIZE;
   var RADIUS = TILE_SIZE + LEG_LENGTH;
   var EDGE_DISTANCE = TILE_SIZE + (1/2 * LEG_LENGTH);
@@ -34,9 +36,6 @@ function initGame() {
   var edges = allCombos([EDGE_DISTANCE, EDGE_DISTANCE, MID_TILE], new Tile());
   var corners = allCombos([CORNER_DISTANCE, CORNER_DISTANCE, CORNER_DISTANCE], new Tile());
 
-  // var superBoard = deepExtend({}, faces, edges, corners);
-
-  // TODO: Make tiles and state 1:1 by migrating faces/edges/corners to singular board.
   gameState.a1 = faces[ -MID_TILE ][ RADIUS ][ MID_TILE ];
   gameState.a2 = faces[ MID_TILE ][ RADIUS ][ MID_TILE ];
   gameState.a3 = faces[ -MID_TILE ][ RADIUS ][ -MID_TILE ];
@@ -99,7 +98,6 @@ function initGame() {
   }
 
   // Add edges
-  // TODO: double check these values
   gameState.a1.addEdge(gameState.b5, gameState.b4, gameState.b3, gameState.a2, gameState.a4, gameState.a3, gameState.b7, gameState.b6);
   gameState.a2.addEdge(gameState.b4, gameState.b3, gameState.b2, gameState.b1, gameState.a8, gameState.a4, gameState.a3, gameState.a1);
   gameState.a3.addEdge(gameState.b6, gameState.a1, gameState.a2, gameState.a4, gameState.a6, gameState.a5, gameState.b8, gameState.b7);
@@ -156,10 +154,6 @@ function initGame() {
   gameState.g6.addEdge(gameState.f1, gameState.f2, gameState.f3, gameState.f4, gameState.f5, gameState.g8, gameState.g7, gameState.g5);
   gameState.g7.addEdge(gameState.g3, gameState.g5, gameState.g6, gameState.g8, gameState.f7, gameState.f8, gameState.g1, gameState.g2);
   gameState.g8.addEdge(gameState.g5, gameState.g6, gameState.f4, gameState.f5, gameState.f6, gameState.f7, gameState.f8, gameState.g7);
-
-  // console.log(faces);
-
-  // console.log('faces[ -MID_TILE ][ RADIUS ][ MID_TILE ].edges:', faces[ -MID_TILE ][ RADIUS ][ MID_TILE ].edges);
 
   /*
   ========================================
@@ -302,7 +296,9 @@ function deepExtend(target) {
   return target;
 }
 
+function findLegal(gameState) {
 
+}
 
 /*
 ========================================
