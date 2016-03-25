@@ -32,10 +32,35 @@ function deepExtend(target, source) {
   return target;
 }
 
-var prev = gameState.f1;
+// function sum() { // sum(3)(4)() === 7;
+//   var total = 0;
+//   if(arguments[0]) {
+//     total += arguments[0];
+//     return sum;
+//   }
+//   else return total += sum;
+// }
 
-for(var i = 0, tile = gameState.d6; i < 9; i++){
-  var current = tile;
-  tile = tile.traverse(prev, tile.capture.bind(tile, 0, {color:0xff0000}));
-  prev = current;
+// console.log(sum(3)(4)());
+
+var str = 'Backbone, d3, Mongoose, SQL, mysql, sqlite, Sequelize, ES6, Gulp, socket.io, Mocha, Chai, levelDB, Material Design';
+
+function alphabetize(str) {
+  console.log('str.split(',')[0]:', str.split(',')[0]);
+
+  return str.split(', ').sort(function(a, b) {
+    var A = a.toLowerCase();
+    var B = b.toLowerCase();
+    if (A < B){
+      return -1;
+    }else if (A > B){
+      return  1;
+    }else{
+      return 0;
+    }
+  }).join(', ');
 }
+
+var x = alphabetize(str);
+console.log('x:', x);
+

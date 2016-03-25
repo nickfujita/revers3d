@@ -88,11 +88,23 @@
   ========================================
    */
 
-  window.socket = io(window.location.host);
+  window.socket = io(window.location.href);
+
+
+  socket.on('join', function() {
+    console.log('player joined!');
+  })
+
+  socket.on('click', function(data) {
+    console.log('click', data);
+
+    // gameState[data.tile].capture(playerTurn, data.player);
+    captureTilesFrom(gameState[data.tile].mesh);
+  })
+
   initGame();
 
   gameState.c1.capture(0, PLAYER[0])
-  // gameState.c3.capture(0, PLAYER[0])
   gameState.d6.capture(0, PLAYER[0])
   gameState.c2.capture(1, PLAYER[1])
   gameState.d5.capture(1, PLAYER[1])
@@ -185,73 +197,19 @@
     event.stopPropagation();
 
     if(focus) {
-
       if(gameState[focus.userData.coord].ownedBy !== null) {
-        console.log(focus.userData.coord, ' already owned');
-        console.log(gameState[focus.userData.coord]);
+        // console.log(focus.userData.coord, ' already owned');
+        // console.log(gameState[focus.userData.coord]);
       }
       else {
-        var tile = gameState[focus.userData.coord];
-        var edges = tile.edges;
-        var toCapture = [tile];
-        var potentialCapture;
-
-        edges.forEach(function(edge, i, edges) {
-          var prev = tile;
-          var next = edge;
-          potentialCapture = [];
-
-          // Loop while the next tile is owned by the opponent, and potentially capture it
-          while (next.ownedBy === (1 - playerTurn)) {
-            next = next.traverse(prev, function(current) {
-              potentialCapture.push(current);
-              prev = current;
-            });
-          }
-
-          // Once the while loop ends, the next tile must either be null or self owned.
-          // If self owned, commit the capture. If null, reject the capture.
-          if(potentialCapture.length && next.ownedBy === playerTurn) {
-            toCapture = toCapture.concat(potentialCapture);
-            potentialCapture = [];
-          }
-          else {
-            potentialCapture = [];
-          }
-        })
-
-        toCapture.forEach(function(tile) {
-          tile.capture(playerTurn, PLAYER[playerTurn]);
-        })
-
-        playerTurn = 1 - playerTurn;
+        captureTilesFrom(focus);
+        console.log(focus);
+        var x = PLAYER[playerTurn];
+        socket.emit('click', {player: PLAYER[playerTurn], tile: focus.userData.coord});
       }
     }
     else {
       console.log('no tile selected');
-    }
-  }
-
-  function lightOpposites(event) {
-    event.stopPropagation();
-
-    if(focus) {
-      var tile = gameState[focus.userData.coord];
-      var edges = tile.edges;
-
-      for (var i = 0; i < edges.length; i++) {
-        var op = (i + (1/2 * edges.length)) % edges.length;
-
-        setTimeout( function(i, op) {
-          gameState[edges[i].coord].light();
-          gameState[edges[op].coord].light();
-
-          setTimeout( function(i, op) {
-            gameState[edges[i].coord].unlight();
-            gameState[edges[op].coord].unlight();
-          }.bind(null, i, op), 1000);
-        }.bind(null, i, op), i * 2000);
-      }
     }
   }
 
@@ -334,6 +292,67 @@
       Helpers
   ========================================
    */
+  function captureTilesFrom(focus) {
+    var tile = gameState[focus.userData.coord];
+    var edges = tile.edges;
+    var toCapture = [tile];
+    var potentialCapture;
+
+    focus.currentHex = PLAYER[playerTurn].color;
+
+    edges.forEach(function(edge, i, edges) {
+      var prev = tile;
+      var next = edge;
+      potentialCapture = [];
+
+      // Loop while the next tile is owned by the opponent, and potentially capture it
+      while (next.ownedBy === (1 - playerTurn)) {
+        next = next.traverse(prev, function(current) {
+          potentialCapture.push(current);
+          prev = current;
+        });
+      }
+
+      // Once the while loop ends, the next tile must either be null or self owned.
+      // If self owned, commit the capture. If null, reject the capture.
+      if(potentialCapture.length && next.ownedBy === playerTurn) {
+        toCapture = toCapture.concat(potentialCapture);
+        potentialCapture = [];
+      }
+      else {
+        potentialCapture = [];
+      }
+    })
+
+    toCapture.forEach(function(tile) {
+      tile.capture(playerTurn, PLAYER[playerTurn]);
+    })
+
+    playerTurn = 1 - playerTurn;
+  }
+
+  function lightOpposites(event) {
+    event.stopPropagation();
+
+    if(focus) {
+      var tile = gameState[focus.userData.coord];
+      var edges = tile.edges;
+
+      for (var i = 0; i < edges.length; i++) {
+        var op = (i + (1/2 * edges.length)) % edges.length;
+
+        setTimeout( function(i, op) {
+          gameState[edges[i].coord].light();
+          gameState[edges[op].coord].light();
+
+          setTimeout( function(i, op) {
+            gameState[edges[i].coord].unlight();
+            gameState[edges[op].coord].unlight();
+          }.bind(null, i, op), 1000);
+        }.bind(null, i, op), i * 2000);
+      }
+    }
+  }
 
   function isMobile() {
     try{ document.createEvent("TouchEvent"); return true; }
@@ -399,11 +418,12 @@
     if ( intersects.length > 0 ) { // on focus
       if ( focus != intersects[ 0 ].object ) { // if focus is on a new object
         // if ( focus ) focus.material.emissive.setHex( focus.currentHex ); // restore color to old object
-
         focus = intersects[ 0 ].object; // Set focus to new object
-        // focus.currentHex = focus.material.emissive.getHex(); // remember focused elements color
-        // focus.material.emissive.setHex( PLAYER[playerTurn].color ); // set focused element to new color
+        focus.currentHex = focus.material.emissive.getHex(); // remember focused elements color
 
+        if(gameState[focus.userData.coord].ownedBy === null) {
+          focus.material.emissive.setHex( PLAYER[playerTurn].color ); // set focused element to new color
+        }
         // gameState[focus.userData.coord].edges.forEach(function(edge) {
         //   edge.mesh.material.emissive.setHex(0x7fff00);
         // })
@@ -411,7 +431,7 @@
     } else {
       if(focus) { // on blur
         // Restore previous properties of intersection
-        // if ( focus ) focus.material.emissive.setHex( focus.currentHex );
+        if ( focus ) focus.material.emissive.setHex( focus.currentHex );
 
         // gameState[focus.userData.coord].edges.forEach(function(edge) {
         //   edge.mesh.material.emissive.setHex(0x000000);
