@@ -346,7 +346,7 @@
     } else {
       if(focus) { // on blur
         // Restore previous properties of intersection
-        if ( focus ) focus.material.emissive.setHex( focus.currentHex );
+        focus.material.emissive.setHex( focus.currentHex );
 
         // gameState[focus.userData.coord].edges.forEach(function(edge) {
         //   edge.mesh.material.emissive.setHex(0x000000);
