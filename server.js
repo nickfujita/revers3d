@@ -10,12 +10,12 @@ var PORT = process.env.PORT || 3030;
 
 app.use('/', express.static('app'));
 
-// io.on('connection', function(socket){
-//   console.log('client connected');
-// });
-
 app.get('/', function(req, res) {
   res.sendFile(__dirname + '/app/index.html');
+});
+
+app.get('/join', function(req, res) {
+  res.sendFile(__dirname + '/app/lobby/index.html');
 });
 
 // Create a new game room
