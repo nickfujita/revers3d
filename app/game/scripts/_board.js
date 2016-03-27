@@ -1,30 +1,26 @@
-function Board(tileWidth, padding, depth, color) {
-  THREE.Object3D.call(this);
-  this.material = { color: 0x999999/*, wireframe: true,*/ };
-  this.TILE_WIDTH = tileWidth;
-  this.PADDING = padding;
-  this.DEPTH = depth;
-}
+function initGame() {
+  window.board = new THREE.Object3D();
 
-Board.prototype = Object.create(THREE.Object3D.prototype);
-Board.constructor = Board;
-
-Board.prototype.init = function(gameState) {
   // Constants
+  var TILE_WIDTH = 19;
+  var BUFFER = 3;
+  var DEPTH = 1;
+  var TILE_SIZE = TILE_WIDTH + BUFFER;
   var CENTER_OF_THE_UNIVERSE = new THREE.Vector3( 0, 0, 0 );
 
   // Tile coords
   /*
-  face = [midTile, midTile, radius]
-  edge = [edgeDistance, edgeDistance, midTile]
-  corner = [cornerDistance, cornerDistance, cornerDistance]
+  face = [MID_TILE, MID_TILE, RADIUS]
+  edge = [EDGE_DISTANCE, EDGE_DISTANCE, MID_TILE]
+  corner = [CORNER_DISTANCE, CORNER_DISTANCE, CORNER_DISTANCE]
   */
-  var tileSize = this.TILE_WIDTH + this.PADDING;
-  var legLength = tileSize * Math.sin( Math.PI / 4 );
-  var midTile = 1/2 * tileSize;
-  var radius = tileSize + legLength;
-  var edgeDistance = tileSize + (1/2 * legLength);
-  var cornerDistance = tileSize + (1/3 * legLength) + (1/2 * this.DEPTH);
+  var LEG_LENGTH = TILE_SIZE * Math.sin( Math.PI / 4 );
+  var MID_TILE = 1/2 * TILE_SIZE;
+  var RADIUS = TILE_SIZE + LEG_LENGTH;
+  var EDGE_DISTANCE = TILE_SIZE + (1/2 * LEG_LENGTH);
+  var CORNER_DISTANCE = TILE_SIZE + (1/3 * LEG_LENGTH) + (1/2 * DEPTH);
+
+  var material = { color: 0x999999/*, wireframe: true,*/ };
 
   /*
   ========================================
@@ -32,20 +28,20 @@ Board.prototype.init = function(gameState) {
   ========================================
    */
 
-  var extrudeSettings = { amount: this.DEPTH, bevelEnabled: false };
+  var extrudeSettings = { amount: DEPTH, bevelEnabled: false };
 
   var equiTri = new THREE.Shape();
-  var cornerWidth = this.TILE_WIDTH;
-  var cornerHeight = ( Math.sqrt(3) / 2 ) * cornerWidth;
-  equiTri.moveTo( -1/2 * cornerWidth, -1/3 * cornerHeight );
-  equiTri.lineTo( 0, 2/3 * cornerHeight );
-  equiTri.lineTo( 1/2 * cornerWidth, -1/3 * cornerHeight );
-  equiTri.lineTo( -1/2 * cornerWidth, -1/3 * cornerHeight );
+  var CORNER_WIDTH = TILE_WIDTH;
+  var CORNER_HEIGHT = ( Math.sqrt(3) / 2 ) * CORNER_WIDTH;
+  equiTri.moveTo( -1/2 * CORNER_WIDTH, -1/3 * CORNER_HEIGHT );
+  equiTri.lineTo(0, 2/3 * CORNER_HEIGHT );
+  equiTri.lineTo( 1/2 * CORNER_WIDTH, -1/3 * CORNER_HEIGHT );
+  equiTri.lineTo( -1/2 * CORNER_WIDTH, -1/3 * CORNER_HEIGHT );
 
   var corner = new THREE.ExtrudeGeometry( equiTri, extrudeSettings );
 
   // Face geometry definitions
-  var zFace = new THREE.BoxGeometry( this.TILE_WIDTH, this.TILE_WIDTH, DEPTH );
+  var zFace = new THREE.BoxGeometry( TILE_WIDTH, TILE_WIDTH, DEPTH );
   var yFace = zFace.clone().rotateX( -Math.PI / 2 );
   var xFace = zFace.clone().rotateY( -Math.PI / 2 );
 
@@ -62,25 +58,27 @@ Board.prototype.init = function(gameState) {
       Tile Placement
   ========================================
    */
+  window.gameState = new GameState(MID_TILE, RADIUS, EDGE_DISTANCE, CORNER_DISTANCE);
   var geometry, mesh;
+
 
   var faces = gameState.faces;
   for(var x in faces) {
     for(var y in faces[x]) {
       for(var z in faces[x][y]) {
-        if(Math.abs(x) == radius) {
+        if(Math.abs(x) == RADIUS) {
           geometry = xFace;
-        } else if(Math.abs(y) == radius) {
+        } else if(Math.abs(y) == RADIUS) {
           geometry = yFace;
         } else {
           geometry = zFace;
         }
 
-        faces[x][y][z].mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial(this.material) );
+        faces[x][y][z].mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial(material) );
         faces[x][y][z].mesh.position.set(x, y, z);
         faces[x][y][z].mesh.userData = { coord: faces[x][y][z].coord };
 
-        this.add( faces[x][y][z].mesh );
+        board.add( faces[x][y][z].mesh );
       }
     }
   }
@@ -89,15 +87,15 @@ Board.prototype.init = function(gameState) {
   for(var x in edges) {
     for(var y in edges[x]) {
       for(var z in edges[x][y]) {
-        if(Math.abs(x) == midTile) {
+        if(Math.abs(x) == MID_TILE) {
           geometry = y * z < 0 ? nxEdge : pxEdge;
-        } else if(Math.abs(y) == midTile) {
+        } else if(Math.abs(y) == MID_TILE) {
           geometry = x * z < 0 ? nyEdge : pyEdge;
         } else {
           geometry = x * y < 0 ? nzEdge : pzEdge;
         }
 
-        edges[x][y][z].mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial(this.material) );
+        edges[x][y][z].mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial(material) );
         edges[x][y][z].mesh.position.set(x, y, z);
         edges[x][y][z].mesh.userData = { coord: edges[x][y][z].coord };
 
@@ -112,7 +110,7 @@ Board.prototype.init = function(gameState) {
       for(var z in corners[x][y]) {
         corners[x][y][z].isCorner = true;
 
-        corners[x][y][z].mesh = new THREE.Mesh( corner, new THREE.MeshLambertMaterial(this.material) );
+        corners[x][y][z].mesh = new THREE.Mesh( corner, new THREE.MeshLambertMaterial(material) );
         corners[x][y][z].mesh.position.set(x, y, z);
         corners[x][y][z].mesh.userData = { coord: corners[x][y][z].coord };
         corners[x][y][z].mesh.lookAt( CENTER_OF_THE_UNIVERSE );

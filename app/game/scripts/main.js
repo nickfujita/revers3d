@@ -4,10 +4,6 @@
       Game vars
   ========================================
    */
-  // window.board = {
-  //   color: 0x999999,
-  // }
-
   var PLAYER = [
     {
       color: 0xff0000
@@ -103,11 +99,9 @@
   })
 
   initGame();
+  gameState.init();
+  scene.add( board );
 
-  gameState.c1.capture(0, PLAYER[0])
-  gameState.d6.capture(0, PLAYER[0])
-  gameState.c2.capture(1, PLAYER[1])
-  gameState.d5.capture(1, PLAYER[1])
 
   var prevTime = performance.now();
 
