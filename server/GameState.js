@@ -6,7 +6,47 @@
  * @param {Number} c Parallel distance to the middle of an edge
  * @param {Number} d Parallel distance to the middle of a corner
  */
-var GameState = function(a, b, c, d) {
+var GameState = function(width, pad, depth) {
+  /*
+  ========================================
+      Board Constants
+      for calculating coordinates
+  ========================================
+   */
+
+  Object.defineProperty(this, 'TILE_WIDTH', {
+    value: width || 19,
+    writeable: false,
+    enumerable: false
+  });
+
+  Object.defineProperty(this, 'PADDING', {
+    value: pad || 3,
+    writeable: false,
+    enumerable: false
+  });
+
+  Object.defineProperty(this, 'DEPTH', {
+    value: depth || 1,
+    writeable: false,
+    enumerable: false
+  });
+
+  var tileSize = this.TILE_WIDTH + this.PADDING;
+  var legLength = tileSize * Math.sin( Math.PI / 4 );
+
+  var a = 1/2 * tileSize;
+  var b = tileSize + legLength;
+  var c = tileSize + (1/2 * legLength);
+  var d = tileSize + (1/3 * legLength) + (1/2 * this.DEPTH);
+
+  /*
+  ========================================
+      Seed properties
+      for storing default tile states
+  ========================================
+   */
+
   Object.defineProperty(this, 'seed', {
     value: {
       faces: allCombos([a, a, b], new Tile()),
@@ -34,6 +74,12 @@ var GameState = function(a, b, c, d) {
     writeable: true,
     enumerable: false
   });
+
+  /*
+  ========================================
+      Enumerable tile states
+  ========================================
+   */
 
   this.a1 = this.faces[ -a ][ b ][ a ];
   this.a2 = this.faces[ a ][ b ][ a ];
@@ -92,7 +138,12 @@ var GameState = function(a, b, c, d) {
   this.g7 = this.faces[ -a ][ -b ][ a ];
   this.g8 = this.faces[ a ][ -b ][ a ];
 
-  // Add edges
+  /*
+  ========================================
+      Establish tile neighbors
+  ========================================
+   */
+
   this.a1.addEdge(this.b5, this.b4, this.b3, this.a2, this.a4, this.a3, this.b7, this.b6);
   this.a2.addEdge(this.b4, this.b3, this.b2, this.b1, this.a8, this.a4, this.a3, this.a1);
   this.a3.addEdge(this.b6, this.a1, this.a2, this.a4, this.a6, this.a5, this.b8, this.b7);

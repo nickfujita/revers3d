@@ -98,10 +98,13 @@
     captureTilesFrom(gameState[data.tile].mesh);
   })
 
-  initGame();
-  gameState.init();
+  var state = new GameState();
+  window.board = new Board(state);
+  // initGame();
+  // gameState.init();
   scene.add( board );
 
+  // var board = new Board()
 
   var prevTime = performance.now();
 
@@ -165,7 +168,7 @@
     }
 
     update();
-    findIntersects();
+    // findIntersects();
     render();
 
     // End FPS calculation

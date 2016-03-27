@@ -1,26 +1,31 @@
-function Board(tileWidth, padding, depth, color) {
+function Board(gameState) {
   THREE.Object3D.call(this);
   this.material = { color: 0x999999/*, wireframe: true,*/ };
-  this.TILE_WIDTH = tileWidth;
-  this.PADDING = padding;
-  this.DEPTH = depth;
+  this.gs = gameState;
+
+  this.init();
 }
 
 Board.prototype = Object.create(THREE.Object3D.prototype);
 Board.constructor = Board;
 
-Board.prototype.init = function(gameState) {
+Board.prototype.init = function() {
   // Constants
   var CENTER_OF_THE_UNIVERSE = new THREE.Vector3( 0, 0, 0 );
 
   // Tile coords
+  var TILE_WIDTH = this.gs.TILE_WIDTH;
+  var PADDING = this.gs.PADDING;
+  var DEPTH = this.gs.DEPTH;
+
   /*
   face = [midTile, midTile, radius]
   edge = [edgeDistance, edgeDistance, midTile]
   corner = [cornerDistance, cornerDistance, cornerDistance]
   */
-  var tileSize = this.TILE_WIDTH + this.PADDING;
+  var tileSize = TILE_WIDTH + PADDING;
   var legLength = tileSize * Math.sin( Math.PI / 4 );
+
   var midTile = 1/2 * tileSize;
   var radius = tileSize + legLength;
   var edgeDistance = tileSize + (1/2 * legLength);
@@ -32,10 +37,10 @@ Board.prototype.init = function(gameState) {
   ========================================
    */
 
-  var extrudeSettings = { amount: this.DEPTH, bevelEnabled: false };
+  var extrudeSettings = { amount: DEPTH, bevelEnabled: false };
 
   var equiTri = new THREE.Shape();
-  var cornerWidth = this.TILE_WIDTH;
+  var cornerWidth = TILE_WIDTH;
   var cornerHeight = ( Math.sqrt(3) / 2 ) * cornerWidth;
   equiTri.moveTo( -1/2 * cornerWidth, -1/3 * cornerHeight );
   equiTri.lineTo( 0, 2/3 * cornerHeight );
@@ -45,7 +50,7 @@ Board.prototype.init = function(gameState) {
   var corner = new THREE.ExtrudeGeometry( equiTri, extrudeSettings );
 
   // Face geometry definitions
-  var zFace = new THREE.BoxGeometry( this.TILE_WIDTH, this.TILE_WIDTH, DEPTH );
+  var zFace = new THREE.BoxGeometry( TILE_WIDTH, TILE_WIDTH, DEPTH );
   var yFace = zFace.clone().rotateX( -Math.PI / 2 );
   var xFace = zFace.clone().rotateY( -Math.PI / 2 );
 
@@ -64,7 +69,9 @@ Board.prototype.init = function(gameState) {
    */
   var geometry, mesh;
 
-  var faces = gameState.faces;
+  var faces = this.gs.faces;
+  console.log('faces, radius:', faces, radius);
+
   for(var x in faces) {
     for(var y in faces[x]) {
       for(var z in faces[x][y]) {
@@ -85,7 +92,7 @@ Board.prototype.init = function(gameState) {
     }
   }
 
-  var edges = gameState.edges;
+  var edges = this.gs.edges;
   for(var x in edges) {
     for(var y in edges[x]) {
       for(var z in edges[x][y]) {
@@ -101,12 +108,12 @@ Board.prototype.init = function(gameState) {
         edges[x][y][z].mesh.position.set(x, y, z);
         edges[x][y][z].mesh.userData = { coord: edges[x][y][z].coord };
 
-        board.add( edges[x][y][z].mesh );
+        this.add( edges[x][y][z].mesh );
       }
     }
   }
 
-  var corners = gameState.corners;
+  var corners = this.gs.corners;
   for(var x in corners) {
     for(var y in corners[x]) {
       for(var z in corners[x][y]) {
@@ -121,7 +128,7 @@ Board.prototype.init = function(gameState) {
           corners[x][y][z].mesh.rotateZ( Math.PI / 3 );
         }
 
-        board.add( corners[x][y][z].mesh );
+        this.add( corners[x][y][z].mesh );
       }
     }
   }
