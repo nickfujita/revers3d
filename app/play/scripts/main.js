@@ -326,7 +326,7 @@
       tile.capture(playerTurn, PLAYER[playerTurn]);
     })
 
-    playerTurn = 1 - playerTurn;
+    playerTurn = ~~!!!playerTurn;
   }
 
   function lightOpposites(event) {
