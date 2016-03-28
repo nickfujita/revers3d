@@ -2,10 +2,19 @@
   outline: 1px red dashed;
 }
 
+@media (max-width: 800px) {
+  section {
+    flex-direction: column;
+  }
+}
+
 section {
   display: flex;
-  margin: 20px auto;
+  /*margin: 20px auto;*/
+  /*padding: 20px;*/
+  align-items: flex-start;
 }
+
 
 h1 {
   margin: 0;
@@ -17,21 +26,71 @@ header {
 
 .button {
   flex: 1;
-  margin: auto 3%;
-  padding: 20px;
-  border: solid 1px black;
-  border-radius: 3px;
+  width: 100px;
+  height: 64px;
+  /*padding: 50px 20px;*/
+  margin: auto 20px;
   text-align: center;
+  background-image: -webkit-linear-gradient(bottom, papayawhip, white);
+  background-image: -o-linear-gradient(bottom, papayawhip, white);
+  background-image: linear-gradient(to top, papayawhip, white);
+  border-radius: 5px;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  -webkit-transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  text-decoration: none;
+}
+
+.button-container {
+  margin: 5px 0px;
+}
+
+.button:visited {
+  color: inherit;
+}
+
+.button::after {
+  content: "";
+  border-radius: 5px;
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  -webkit-transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.button:hover {
+  -webkit-transform: scale(1.02, 1.02);
+  transform: scale(1.02, 1.02);
+}
+
+.button:hover::after {
+  opacity: 1;
 }
 
 #play {
   height: 300px;
 }
 
+#how {
+  height: 400px;
+  /*text-align: justify;*/
+}
+
 .how-container {
-  flex: 1;
-  margin: auto;
+  /*flex: 1;*/
+  display: inline-block;
+  margin: auto auto;
   text-align: center;
+
+}
+
+.how-text {
+  margin: 0;
 }
 
 #about {
