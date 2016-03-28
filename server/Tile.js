@@ -1,7 +1,6 @@
-
 /*
 ========================================
-    Graph Nodes (board tiles)
+    Tiles (graph nodes)
 ========================================
  */
 
@@ -16,11 +15,6 @@ function Tile(isCorner) {
   this.isCorner = !!isCorner;
 }
 
-/**
- * Direction in which to check for tiles for capture
- * @param  {Character} direction direction to traverse
- * @return {Number}            number of pieces captured
- */
 Tile.prototype.traverse = function(fromTile, callback) {
   var toIndex = (this.edges.indexOf(fromTile) + (1/2 * this.edges.length)) % this.edges.length;
 
@@ -28,7 +22,6 @@ Tile.prototype.traverse = function(fromTile, callback) {
 
   return this.edges[toIndex];
 }
-
 
 Tile.prototype.addEdge = function() {
   var end = this.isCorner ? 6 : 8;
@@ -52,3 +45,5 @@ Tile.prototype.capture = function(playerNum, color) {
   this.ownedBy = playerNum;
   this.light(color);
 }
+
+module.exports = Tile;

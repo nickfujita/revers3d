@@ -76,19 +76,20 @@
     update = camera.updateProjectionMatrix.bind( camera );
   }
 
-  window.requestAnimationFrame( animate );
-
   /*
   ========================================
       Sockets
   ========================================
    */
 
-  window.socket = io(window.location.href);
+  var socket = io(window.location.href, {some: 'data'});
 
 
-  socket.on('join', function() {
-    console.log('player joined!');
+  socket.on('connectSuccess', function(data) {
+    console.log('Joined. Moves so far:', data);
+    var board = new Board(data);
+    scene.add( board );
+
   })
 
   socket.on('click', function(data) {
@@ -98,11 +99,9 @@
     captureTilesFrom(gameState[data.tile].mesh);
   })
 
-  var state = new GameState();
-  window.board = new Board(state);
+  // var state = new GameState();
   // initGame();
   // gameState.init();
-  scene.add( board );
 
   // var board = new Board()
 
@@ -128,6 +127,8 @@
   var focus, intersects;
   var sightline = new THREE.Raycaster();
   var mouse = new THREE.Vector2();
+
+  window.requestAnimationFrame( animate );
 
   // FPS
   var fps = new Stats();

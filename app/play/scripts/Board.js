@@ -70,8 +70,6 @@ Board.prototype.init = function() {
   var geometry, mesh;
 
   var faces = this.gs.faces;
-  console.log('faces, radius:', faces, radius);
-
   for(var x in faces) {
     for(var y in faces[x]) {
       for(var z in faces[x][y]) {
@@ -117,7 +115,7 @@ Board.prototype.init = function() {
   for(var x in corners) {
     for(var y in corners[x]) {
       for(var z in corners[x][y]) {
-        corners[x][y][z].isCorner = true;
+        // corners[x][y][z].isCorner = true;
 
         corners[x][y][z].mesh = new THREE.Mesh( corner, new THREE.MeshLambertMaterial(this.material) );
         corners[x][y][z].mesh.position.set(x, y, z);

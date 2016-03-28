@@ -1,12 +1,35 @@
-var Game = require('../db/gameModel').gameModel;
+var gameDb = require('../db/gameModel').gameModel;
+var utils = require('./utils');
+var GameState = require('./GameState');
 
-var connect = function(roomUrl, board, io) {
-  // Set the socket.io namespace to the roomUrl.
+var masterState = new GameState();
+// console.log('masterState.data:', masterState.data);
+
+function createRoom(roomUrl, io) {
+  return io.of(roomUrl, function(socket) {
+    console.log('connection!', socket.id);
+
+    socket.on('disconnect', function() {
+      console.log('disconnect!', socket.id);
+    })
+  });
+}
+
+function connect(roomUrl, moves, io) {
+
+  // TODO: make singleton task per connection. .of() registers listeners every
+  // time a new connection is made.
   var room = io.of(roomUrl);
+  // room.moves = [];
+  room.gameState = utils.deepExtend({}, masterState);
+  // console.log('room.gameState.data:', room.gameState.data);
+
 
   room.once('connection', function(client) {
     // Send the current state of the board to the client immediately on joining.
-    client.broadcast.emit('join', board);
+
+    client.emit('connectSuccess', room.gameState.data);
+    // console.log('room.gameState.data:', room.gameState.data);
 
     client.on('event', function(data) {
       // Do some stuff
@@ -33,7 +56,7 @@ var connect = function(roomUrl, board, io) {
 
 
       //Update the game with the new stroke.
-      Game.update({roomId: roomId},{$push: {strokes: finishedStroke} },{upsert:true},function(err, board){
+      gameDb.update({roomId: roomId},{$push: {strokes: finishedStroke} },{upsert:true},function(err, board){
         if(err){ console.log(err); }
         else {
           console.log("Successfully added");
@@ -50,4 +73,8 @@ var connect = function(roomUrl, board, io) {
 };
 
 // Required by [server.js](../documentation/server.html)
-module.exports = connect;
+module.exports = {
+  connect: connect,
+  createRoom: createRoom,
+
+};

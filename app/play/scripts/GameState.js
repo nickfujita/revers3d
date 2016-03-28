@@ -1,30 +1,20 @@
-// require Tile
-var Tile = require('./Tile');
-var utils = require('./utils')
+var _MASTER_DATA = {};
 
-// var _MASTER_DATA = calcMasterData();
+_MASTER_DATA.TILE_WIDTH = 19;
+_MASTER_DATA.PADDING = 3;
+_MASTER_DATA.DEPTH = 1;
 
-// function calcMasterData(width, pad, depth) {
-  var _MASTER_DATA = {};
+var tileSize = _MASTER_DATA.TILE_WIDTH + _MASTER_DATA.PADDING;
+var legLength = tileSize * Math.sin( Math.PI / 4 );
 
-  _MASTER_DATA.TILE_WIDTH = 19;
-  _MASTER_DATA.PADDING = 3;
-  _MASTER_DATA.DEPTH = 1;
+var a = 1/2 * tileSize;
+var b = tileSize + legLength;
+var c = tileSize + (1/2 * legLength);
+var d = tileSize + (1/3 * legLength) + (1/2 * _MASTER_DATA.DEPTH);
 
-  var tileSize = _MASTER_DATA.TILE_WIDTH + _MASTER_DATA.PADDING;
-  var legLength = tileSize * Math.sin( Math.PI / 4 );
-
-  var a = 1/2 * tileSize;
-  var b = tileSize + legLength;
-  var c = tileSize + (1/2 * legLength);
-  var d = tileSize + (1/3 * legLength) + (1/2 * _MASTER_DATA.DEPTH);
-
-  _MASTER_DATA.faces = utils.allCombos([a, a, b], new Tile());
-  _MASTER_DATA.edges = utils.allCombos([c, c, a], new Tile());
-  _MASTER_DATA.corners = utils.allCombos([d, d, d], new Tile(true));
-
-//   return MASTER_DATA;
-// }
+_MASTER_DATA.faces = allCombos([a, a, b], new Tile());
+_MASTER_DATA.edges = allCombos([c, c, a], new Tile());
+_MASTER_DATA.corners = allCombos([d, d, d], new Tile(true));
 
 /**
  * Game state constructor - establishes the spatial relationships between tiles
@@ -34,20 +24,7 @@ var utils = require('./utils')
  * @param {Number} d Parallel distance to the middle of a corner
  */
 function GameState(width, pad, depth) {
-  /*
-  ========================================
-      Board Constants
-      for calculating coordinates
-  ========================================
-   */
-
-  // Object.defineProperty(this, 'data', {
-  //   value: utils.deepExtend({}, _MASTER_DATA),
-  //   writeable: true,
-  //   enumerable: false
-  // });
-
-  this.data = utils.deepExtend({}, _MASTER_DATA);
+  this.data = deepExtend({}, _MASTER_DATA);
 
   /*
   ========================================
@@ -133,9 +110,9 @@ GameState.prototype.capture = function(coord) {
 }
 
 GameState.prototype.reset = function() {
-  this.data.faces = utils.deepExtend({}, _MASTER_DATA.faces);
-  this.data.edges = utils.deepExtend({}, _MASTER_DATA.edges);
-  this.data.corners = utils.deepExtend({}, _MASTER_DATA.corners);
+  this.data.faces = deepExtend({}, _MASTER_DATA.faces);
+  this.data.edges = deepExtend({}, _MASTER_DATA.edges);
+  this.data.corners = deepExtend({}, _MASTER_DATA.corners);
 
   this.init();
 }
@@ -199,4 +176,35 @@ GameState.prototype.configure = function() {
   this.g8.addEdge(this.g5, this.g6, this.f4, this.f5, this.f6, this.f7, this.f8, this.g7);
 }
 
-module.exports = GameState;
+function allCombos(remaining, init) {
+  var objSoFar = {};
+
+  if(remaining.length) {
+    for(var i = 0; i < remaining.length; i++) {
+      objSoFar[remaining[i]] = deepExtend({}, allCombos(remaining.slice(0, i).concat(remaining.slice(i+1)), init));
+      objSoFar[-remaining[i]] = deepExtend({}, allCombos(remaining.slice(0, i).concat(remaining.slice(i+1)), init));
+    }
+  }
+  else {
+    objSoFar = init;
+  }
+
+  return objSoFar;
+}
+
+function deepExtend(target) {
+  var sources = Array.prototype.slice.call(arguments, 1);
+
+  for(var i = 0; i < sources.length; i++) {
+    for(var key in sources[i]) {
+      if(target.hasOwnProperty(key) && typeof sources[i][key] === 'object') {
+        deepExtend(target[key], sources[i][key]);
+      }
+      else {
+        target[key] = sources[i][key];
+      }
+    }
+  }
+
+  return target;
+}
