@@ -4,6 +4,7 @@
 
 section {
   display: flex;
+  margin: 20px auto;
 }
 
 h1 {
@@ -15,7 +16,7 @@ header {
 }
 
 .button {
-  flex: 30;
+  flex: 1;
   margin: auto 3%;
   padding: 20px;
   border: solid 1px black;
@@ -27,10 +28,16 @@ header {
   height: 300px;
 }
 
-.how_container {
-  padding: 20px;
+.how-container {
+  flex: 1;
+  margin: auto;
+  text-align: center;
 }
 
-#how > img {
-  width: 200px;
+#about {
+  flex-direction: column;
+}
+
+#about > p {
+  margin: 20px;
 }
