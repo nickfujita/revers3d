@@ -14,9 +14,9 @@ Board.prototype.init = function() {
   var CENTER_OF_THE_UNIVERSE = new THREE.Vector3( 0, 0, 0 );
 
   // Tile coords
-  var TILE_WIDTH = this.gs.TILE_WIDTH;
-  var PADDING = this.gs.PADDING;
-  var DEPTH = this.gs.DEPTH;
+  var TILE_WIDTH = this.gs.data.TILE_WIDTH;
+  var PADDING = this.gs.data.PADDING;
+  var DEPTH = this.gs.data.DEPTH;
 
   /*
   face = [midTile, midTile, radius]
@@ -69,7 +69,7 @@ Board.prototype.init = function() {
    */
   var geometry, mesh;
 
-  var faces = this.gs.faces;
+  var faces = this.gs.data.faces;
   for(var x in faces) {
     for(var y in faces[x]) {
       for(var z in faces[x][y]) {
@@ -90,7 +90,7 @@ Board.prototype.init = function() {
     }
   }
 
-  var edges = this.gs.edges;
+  var edges = this.gs.data.edges;
   for(var x in edges) {
     for(var y in edges[x]) {
       for(var z in edges[x][y]) {
@@ -111,7 +111,7 @@ Board.prototype.init = function() {
     }
   }
 
-  var corners = this.gs.corners;
+  var corners = this.gs.data.corners;
   for(var x in corners) {
     for(var y in corners[x]) {
       for(var z in corners[x][y]) {

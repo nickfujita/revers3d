@@ -23,7 +23,7 @@ _MASTER_DATA.corners = allCombos([d, d, d], new Tile(true));
  * @param {Number} c Parallel distance to the middle of an edge
  * @param {Number} d Parallel distance to the middle of a corner
  */
-function GameState(width, pad, depth) {
+function GameState() {
   this.data = deepExtend({}, _MASTER_DATA);
 
   /*

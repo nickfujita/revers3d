@@ -1,5 +1,7 @@
 function initGame() {
   window.board = new THREE.Object3D();
+  window.gameState = new GameState(MID_TILE, RADIUS, EDGE_DISTANCE, CORNER_DISTANCE);
+  gameState.configure();
 
   // Constants
   var TILE_WIDTH = 19;
@@ -58,11 +60,10 @@ function initGame() {
       Tile Placement
   ========================================
    */
-  window.gameState = new GameState(MID_TILE, RADIUS, EDGE_DISTANCE, CORNER_DISTANCE);
   var geometry, mesh;
 
+  var faces = gameState.data.faces;
 
-  var faces = gameState.faces;
   for(var x in faces) {
     for(var y in faces[x]) {
       for(var z in faces[x][y]) {
@@ -83,7 +84,7 @@ function initGame() {
     }
   }
 
-  var edges = gameState.edges;
+  var edges = gameState.data.edges;
   for(var x in edges) {
     for(var y in edges[x]) {
       for(var z in edges[x][y]) {
@@ -104,7 +105,7 @@ function initGame() {
     }
   }
 
-  var corners = gameState.corners;
+  var corners = gameState.data.corners;
   for(var x in corners) {
     for(var y in corners[x]) {
       for(var z in corners[x][y]) {
