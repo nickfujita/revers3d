@@ -141,8 +141,40 @@ GameState.prototype.init = function() {
   this.d5.setOwner(1);
 }
 
-GameState.prototype.capture = function(coord) {
+GameState.prototype.capture = function(coord, playerTurn) {
+  var tile = this[coord];
+  var edges = tile.edges;
+  var toCapture = [tile];
+  var potentialCapture;
 
+  focus.currentHex = PLAYER[playerTurn].color;
+
+  edges.forEach(function(edge, i, edges) {
+    var prev = tile;
+    var next = edge;
+    potentialCapture = [];
+
+    // Loop while the next tile is owned by the opponent, and potentially capture it
+    while (next.ownedBy === (1 - playerTurn)) {
+      next = next.traverse(prev, function(current) {
+        potentialCapture.push(current);
+        prev = current;
+      });
+    }
+
+    // Once the while loop ends, the next tile must either be null or self owned.
+    // If self owned, commit the capture. If null, reject the capture.
+    if(potentialCapture.length && next.ownedBy === playerTurn) {
+      toCapture = toCapture.concat(potentialCapture);
+      potentialCapture = [];
+    } else {
+      potentialCapture = [];
+    }
+  })
+
+  toCapture.forEach(function(tile) {
+    tile.setOwner(playerTurn);
+  })
 }
 
 GameState.prototype.reset = function() {

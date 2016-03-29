@@ -12,7 +12,7 @@
 function Board(gameState, players) {
   THREE.Object3D.call(this);
   this.gs = gameState;
-  this.player = players;
+  this.players = players;
   this.material = { color: 0x999999/*, wireframe: true,*/ };
 
   // Constants
@@ -130,7 +130,7 @@ function Board(gameState, players) {
       }
     }
   }
-
+  this.gs.configure();
   this.init();
 }
 
@@ -154,9 +154,60 @@ Board.prototype.unlight = function(coord, color) {
   tile.mesh.material.emissive.setHex(tile.previousColor);
 }
 
+Board.prototype.draw = function(scene) {
+  scene.add(this);
+}
+
+Board.prototype.erase = function(scene) {
+  scene.remove(this);
+}
+
 Board.prototype.init = function() {
-  this.light('c1', this.player[0].color);
-  this.light('d6', this.player[0].color);
-  this.light('c2', this.player[1].color);
-  this.light('d5', this.player[1].color);
+  this.light('c1', this.players[0].color);
+  this.light('d6', this.players[0].color);
+  this.light('c2', this.players[1].color);
+  this.light('d5', this.players[1].color);
+
+  this.gs.init();
+}
+
+Board.prototype.capture = function(coord, playerNum) {
+  var tile = this.gs[coord];
+  var edges = tile.edges;
+  var toCapture = [tile];
+  var potentialCapture;
+  var capColor = this.players[playerNum].color;
+
+  edges.forEach(function(edge, i, edges) {
+    var prev = tile;
+    var next = edge;
+    potentialCapture = [];
+
+    // Loop while the next tile is owned by the opponent, and potentially capture it
+    while (next.ownedBy === (1 - playerNum)) {
+      next = next.traverse(prev, function(current) {
+        potentialCapture.push(current);
+        prev = current;
+      });
+    }
+
+    // Once the while loop ends, the next tile must either be null or self owned.
+    // If self owned, commit the capture. If null, reject the capture.
+    if(potentialCapture.length && next.ownedBy === playerNum) {
+      toCapture = toCapture.concat(potentialCapture);
+      potentialCapture = [];
+    } else {
+      potentialCapture = [];
+    }
+  })
+
+  var currentBoard = this;
+  toCapture.forEach(function(tile, i) {
+    tile.setOwner(playerNum);
+    tile.mesh.currentHex = capColor;
+    // Light captured tiles on a delay for visual appeal
+    setTimeout( function() {
+      currentBoard.light(tile.coord, capColor);
+    }, i * 50);
+  })
 }

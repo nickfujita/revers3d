@@ -86,18 +86,10 @@
       Initialize gameplay
   ========================================
    */
-   var gameState = new GameState();
-   window.board = new Board(gameState, PLAYER);
-   gameState.configure();
-   gameState.init();
+   window.board = new Board(new GameState(), PLAYER);
+   var gameState = board.gs;
 
-   // console.log('board.gs === state:', board.gs === state);
-
-   // console.log('board:', board);
-
-   // board.init();
-   // initGame();
-   scene.add(board);
+   board.draw(scene);
 
   /*
   ========================================
@@ -186,11 +178,12 @@
     event.stopPropagation();
 
     if(focus) {
-      if(gameState[focus.userData.coord].ownedBy === null) {
-        captureTilesFrom(focus);
+      var coord = focus.userData.coord;
+      if(gameState[coord].ownedBy === null) {
+        board.capture(coord, playerTurn);
+        playerTurn = ~~!!!playerTurn;
       } else {
-        console.log(focus.userData.coord, 'already owned by player', gameState[focus.userData.coord].ownedBy);
-
+        console.log(focus.userData.coord, 'already owned by player', gameState[coord].ownedBy);
       }
     } else {
       console.log('no tile selected');
@@ -276,67 +269,6 @@
       Helpers
   ========================================
    */
-  function captureTilesFrom(focus) {
-    var tile = gameState[focus.userData.coord];
-    var edges = tile.edges;
-    var toCapture = [tile];
-    var potentialCapture;
-
-    focus.currentHex = PLAYER[playerTurn].color;
-
-    edges.forEach(function(edge, i, edges) {
-      var prev = tile;
-      var next = edge;
-      potentialCapture = [];
-
-      // Loop while the next tile is owned by the opponent, and potentially capture it
-      while (next.ownedBy === (1 - playerTurn)) {
-        next = next.traverse(prev, function(current) {
-          potentialCapture.push(current);
-          prev = current;
-        });
-      }
-
-      // Once the while loop ends, the next tile must either be null or self owned.
-      // If self owned, commit the capture. If null, reject the capture.
-      if(potentialCapture.length && next.ownedBy === playerTurn) {
-        toCapture = toCapture.concat(potentialCapture);
-        potentialCapture = [];
-      } else {
-        potentialCapture = [];
-      }
-    })
-
-    toCapture.forEach(function(tile) {
-      tile.capture(playerTurn, PLAYER[playerTurn]);
-    })
-
-    playerTurn = 1 - playerTurn;
-  }
-
-  function lightOpposites(event) {
-    event.stopPropagation();
-
-    if(focus) {
-      var tile = gameState[focus.userData.coord];
-      var edges = tile.edges;
-
-      for (var i = 0; i < edges.length; i++) {
-        var op = (i + (1/2 * edges.length)) % edges.length;
-
-        setTimeout( function(i, op) {
-          gameState[edges[i].coord].light();
-          gameState[edges[op].coord].light();
-
-          setTimeout( function(i, op) {
-            gameState[edges[i].coord].unlight();
-            gameState[edges[op].coord].unlight();
-          }.bind(null, i, op), 1000);
-        }.bind(null, i, op), i * 2000);
-      }
-    }
-  }
-
   function isMobile() {
     try{ document.createEvent("TouchEvent"); return true; }
     catch(e){ return false; }
