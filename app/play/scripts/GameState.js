@@ -1,20 +1,50 @@
-var _MASTER_DATA = {};
+window.getters = (function() {
+  var _MASTER_DATA = {};
 
-_MASTER_DATA.TILE_WIDTH = 19;
-_MASTER_DATA.PADDING = 3;
-_MASTER_DATA.DEPTH = 1;
+  _MASTER_DATA.TILE_WIDTH = 19;
+  _MASTER_DATA.PADDING = 3;
+  _MASTER_DATA.DEPTH = 1;
 
-var tileSize = _MASTER_DATA.TILE_WIDTH + _MASTER_DATA.PADDING;
-var legLength = tileSize * Math.sin( Math.PI / 4 );
+  var tileSize = _MASTER_DATA.TILE_WIDTH + _MASTER_DATA.PADDING;
+  var legLength = tileSize * Math.sin( Math.PI / 4 );
 
-var a = 1/2 * tileSize;
-var b = tileSize + legLength;
-var c = tileSize + (1/2 * legLength);
-var d = tileSize + (1/3 * legLength) + (1/2 * _MASTER_DATA.DEPTH);
+  var a = 1/2 * tileSize;
+  var b = tileSize + legLength;
+  var c = tileSize + (1/2 * legLength);
+  var d = tileSize + (1/3 * legLength) + (1/2 * _MASTER_DATA.DEPTH);
 
-_MASTER_DATA.faces = allCombos([a, a, b], new Tile());
-_MASTER_DATA.edges = allCombos([c, c, a], new Tile());
-_MASTER_DATA.corners = allCombos([d, d, d], new Tile(true));
+  _MASTER_DATA.faces = allCombos([a, a, b], new Tile());
+  _MASTER_DATA.edges = allCombos([c, c, a], new Tile());
+  _MASTER_DATA.corners = allCombos([d, d, d], new Tile(true));
+
+  function getMasterData() {
+    return _MASTER_DATA;
+  }
+
+  function getA() {
+    return a;
+  }
+
+  function getB() {
+    return b;
+  }
+
+  function getC() {
+    return c;
+  }
+
+  function getD() {
+    return d;
+  }
+
+  return {
+    getMasterData: getMasterData,
+    getA: getA,
+    getB: getB,
+    getC: getC,
+    getD: getD,
+  }
+})();
 
 /**
  * Game state constructor - establishes the spatial relationships between tiles
@@ -24,6 +54,12 @@ _MASTER_DATA.corners = allCombos([d, d, d], new Tile(true));
  * @param {Number} d Parallel distance to the middle of a corner
  */
 function GameState() {
+  var _MASTER_DATA = getters.getMasterData();
+  var a = getters.getA();
+  var b = getters.getB();
+  var c = getters.getC();
+  var d = getters.getD();
+
   this.data = deepExtend({}, _MASTER_DATA);
 
   /*
@@ -99,10 +135,10 @@ function GameState() {
 }
 
 GameState.prototype.init = function() {
-  this.c1.capture(0, 0xff0000);
-  this.d6.capture(0, 0xff0000);
-  this.c2.capture(1, 0x1e09ff);
-  this.d5.capture(1, 0x1e09ff);
+  this.c1.setOwner(0);
+  this.d6.setOwner(0);
+  this.c2.setOwner(1);
+  this.d5.setOwner(1);
 }
 
 GameState.prototype.capture = function(coord) {
@@ -184,8 +220,7 @@ function allCombos(remaining, init) {
       objSoFar[remaining[i]] = deepExtend({}, allCombos(remaining.slice(0, i).concat(remaining.slice(i+1)), init));
       objSoFar[-remaining[i]] = deepExtend({}, allCombos(remaining.slice(0, i).concat(remaining.slice(i+1)), init));
     }
-  }
-  else {
+  } else {
     objSoFar = init;
   }
 
@@ -199,8 +234,7 @@ function deepExtend(target) {
     for(var key in sources[i]) {
       if(target.hasOwnProperty(key) && typeof sources[i][key] === 'object') {
         deepExtend(target[key], sources[i][key]);
-      }
-      else {
+      } else {
         target[key] = sources[i][key];
       }
     }

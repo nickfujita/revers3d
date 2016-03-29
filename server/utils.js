@@ -6,8 +6,7 @@ function allCombos(remaining, init) {
       objSoFar[remaining[i]] = deepExtend({}, allCombos(remaining.slice(0, i).concat(remaining.slice(i+1)), init));
       objSoFar[-remaining[i]] = deepExtend({}, allCombos(remaining.slice(0, i).concat(remaining.slice(i+1)), init));
     }
-  }
-  else {
+  } else {
     objSoFar = init;
   }
 
@@ -21,8 +20,7 @@ function deepExtend(target) {
     for(var key in sources[i]) {
       if(target.hasOwnProperty(key) && typeof sources[i][key] === 'object') {
         deepExtend(target[key], sources[i][key]);
-      }
-      else {
+      } else {
         target[key] = sources[i][key];
       }
     }

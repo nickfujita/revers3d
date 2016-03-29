@@ -1,15 +1,20 @@
-function Board(gameState) {
+/*
+========================================
+    Board (Three.Object3D object)
+
+    View layer. Board produces the actual, player-interactive object
+========================================
+ */
+
+/**
+ * @param {Object} gameState -Current state of the game
+ */
+function Board(gameState, players) {
   THREE.Object3D.call(this);
-  this.material = { color: 0x999999/*, wireframe: true,*/ };
   this.gs = gameState;
+  this.player = players;
+  this.material = { color: 0x999999/*, wireframe: true,*/ };
 
-  this.init();
-}
-
-Board.prototype = Object.create(THREE.Object3D.prototype);
-Board.constructor = Board;
-
-Board.prototype.init = function() {
   // Constants
   var CENTER_OF_THE_UNIVERSE = new THREE.Vector3( 0, 0, 0 );
 
@@ -18,11 +23,6 @@ Board.prototype.init = function() {
   var PADDING = this.gs.data.PADDING;
   var DEPTH = this.gs.data.DEPTH;
 
-  /*
-  face = [midTile, midTile, radius]
-  edge = [edgeDistance, edgeDistance, midTile]
-  corner = [cornerDistance, cornerDistance, cornerDistance]
-  */
   var tileSize = TILE_WIDTH + PADDING;
   var legLength = tileSize * Math.sin( Math.PI / 4 );
 
@@ -130,4 +130,33 @@ Board.prototype.init = function() {
       }
     }
   }
+
+  this.init();
+}
+
+Board.prototype = Object.create(THREE.Object3D.prototype);
+Board.constructor = Board;
+
+Board.prototype.light = function(coord, color) {
+  color = color || 0x7fff00;
+
+  var tile = this.gs[coord];
+
+  tile.previousColor = tile.mesh.material.emissive.getHex();
+  tile.mesh.material.emissive.setHex(color);
+}
+
+Board.prototype.unlight = function(coord, color) {
+  color = color || 0x7fff00;
+
+  var tile = this.gs[coord];
+
+  tile.mesh.material.emissive.setHex(tile.previousColor);
+}
+
+Board.prototype.init = function() {
+  this.light('c1', this.player[0].color);
+  this.light('d6', this.player[0].color);
+  this.light('c2', this.player[1].color);
+  this.light('d5', this.player[1].color);
 }

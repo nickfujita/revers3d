@@ -30,8 +30,7 @@ app.get('/new', function(req, res) {
       // var gameState = new GameState();
       // sockets.createRoom('/game/' + board.roomId, io);
       res.redirect('/play/' + board.roomId);
-    }
-    else {
+    } else {
       console.error("Error creating new game. Please retry.", err);
       res.redirect('/');
     }

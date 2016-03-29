@@ -69,8 +69,7 @@
 
     render = stereo.render.bind( stereo, scene, camera );
     update = controls.update.bind( controls );
-  }
-  else {
+  } else {
     enablePointerLock();
     window.controls = new THREE.PointerLockControls( camera );
     controls.getObject().position.y = 0;
@@ -87,9 +86,10 @@
       Initialize gameplay
   ========================================
    */
-   // var state = new GameState();
-   // state.configure();
-   var board = new Board(new GameState());
+   var gameState = new GameState();
+   window.board = new Board(gameState, PLAYER);
+   gameState.configure();
+   gameState.init();
 
    // console.log('board.gs === state:', board.gs === state);
 
@@ -186,18 +186,13 @@
     event.stopPropagation();
 
     if(focus) {
-      if(gameState[focus.userData.coord].ownedBy !== null) {
-        // console.log(focus.userData.coord, ' already owned');
-        // console.log(gameState[focus.userData.coord]);
-      }
-      else {
+      if(gameState[focus.userData.coord].ownedBy === null) {
         captureTilesFrom(focus);
-        console.log(focus);
-        var x = PLAYER[playerTurn];
-        socket.emit('click', {player: PLAYER[playerTurn], tile: focus.userData.coord});
+      } else {
+        console.log(focus.userData.coord, 'already owned by player', gameState[focus.userData.coord].ownedBy);
+
       }
-    }
-    else {
+    } else {
       console.log('no tile selected');
     }
   }
@@ -307,8 +302,7 @@
       if(potentialCapture.length && next.ownedBy === playerTurn) {
         toCapture = toCapture.concat(potentialCapture);
         potentialCapture = [];
-      }
-      else {
+      } else {
         potentialCapture = [];
       }
     })

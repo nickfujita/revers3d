@@ -65,8 +65,7 @@
 
     render = stereo.render.bind( stereo, scene, camera );
     update = controls.update.bind( controls );
-  }
-  else {
+  } else {
     enablePointerLock();
     window.controls = new THREE.PointerLockControls( camera );
     controls.getObject().position.y = 0;
@@ -198,15 +197,13 @@
       if(gameState[focus.userData.coord].ownedBy !== null) {
         // console.log(focus.userData.coord, ' already owned');
         // console.log(gameState[focus.userData.coord]);
-      }
-      else {
+      } else {
         captureTilesFrom(focus);
         console.log(focus);
         var x = PLAYER[playerTurn];
         socket.emit('click', {player: PLAYER[playerTurn], tile: focus.userData.coord});
       }
-    }
-    else {
+    } else {
       console.log('no tile selected');
     }
   }
@@ -316,8 +313,7 @@
       if(potentialCapture.length && next.ownedBy === playerTurn) {
         toCapture = toCapture.concat(potentialCapture);
         potentialCapture = [];
-      }
-      else {
+      } else {
         potentialCapture = [];
       }
     })
@@ -370,8 +366,7 @@
       // Enter fullscreen
       requestFullScreen.call(docEl);
       if(enterFS) enterFS();
-    }
-    else {
+    } else {
       if(exitFS) exitFS();
       // Exit fullscreen
       cancelFullScreen.call(doc);
