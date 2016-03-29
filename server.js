@@ -2,9 +2,12 @@ var express = require ('express');
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
-var Game = require('./db/gameModel').gameModel;
-var openSocketConnection = require('./server/socketHandler');
-var helpers = require('./server/helpers');
+
+var utils = require('./server/utils');
+
+var gameDb = require('./db/gameModel').gameModel;
+var Rooms = require('./server/Rooms');
+var sockets = require('./server/socketHandler');
 
 var PORT = process.env.PORT || 3030;
 
@@ -20,33 +23,31 @@ app.get('/join', function(req, res) {
 
 // Create a new game room
 app.get('/new', function(req, res) {
-  var roomId = helpers.randStr(4);
-  var board = new Game({roomId: roomId, moves: [], private:false});
-  var id = board.roomId.toString();
+  var roomId = utils.randStr(4);
+  var board = new gameDb({roomId: roomId, moves: [], private: false});
   board.save(function(err, board) {
-    if (err) { console.error(err); }
-    else {
-      console.log('created game @', id);
+    if(board) {
+      // var gameState = new GameState();
+      // sockets.createRoom('/game/' + board.roomId, io);
+      res.redirect('/play/' + board.roomId);
+    } else {
+      console.error("Error creating new game. Please retry.", err);
+      res.redirect('/');
     }
   });
-  // Redirect to the new board.
-  res.redirect('/game/' + id);
+});
+
+app.get('/play/single', function(req, res) {
+  res.sendFile(__dirname + '/app/play/single.html');
 });
 
 // Join an existing room by id
-app.get('/game/:roomId', function(req, res) {
+app.get('/play/:roomId', function(req, res) {
   var roomId = req.params.roomId;
-  Game.findOne({roomId: roomId}, function(err, board) {
-    // If the game doesn't exist, or the route is invalid,
-    // then redirect to the home page.
-    if (board) {
-      console.log('joined game @', roomId);
-      // Invoke [request handler](../documentation/sockets.html) for a new socket connection
-      // with board id as the Socket.io namespace.
-      openSocketConnection(req.url, board, io);
-      // Send back whiteboard html template.
-      res.sendFile(__dirname + '/app/game/index.html');
-      // res.end();
+  gameDb.findOne({roomId: roomId}, function(err, board) {
+    if(board) {
+      res.sendFile(__dirname + '/app/play/multi.html');
+      sockets.connect(req.url, board.moves, io);
     } else {
       res.redirect('/');
     }

@@ -4,10 +4,6 @@
       Game vars
   ========================================
    */
-  // window.board = {
-  //   color: 0x999999,
-  // }
-
   var PLAYER = [
     {
       color: 0xff0000
@@ -69,8 +65,7 @@
 
     render = stereo.render.bind( stereo, scene, camera );
     update = controls.update.bind( controls );
-  }
-  else {
+  } else {
     enablePointerLock();
     window.controls = new THREE.PointerLockControls( camera );
     controls.getObject().position.y = 0;
@@ -80,19 +75,20 @@
     update = camera.updateProjectionMatrix.bind( camera );
   }
 
-  window.requestAnimationFrame( animate );
-
   /*
   ========================================
       Sockets
   ========================================
    */
 
-  window.socket = io(window.location.href);
+  var socket = io(window.location.href, {some: 'data'});
 
 
-  socket.on('join', function() {
-    console.log('player joined!');
+  socket.on('connectSuccess', function(data) {
+    console.log('Joined. Moves so far:', data);
+    var board = new Board(data);
+    scene.add( board );
+
   })
 
   socket.on('click', function(data) {
@@ -102,12 +98,11 @@
     captureTilesFrom(gameState[data.tile].mesh);
   })
 
-  initGame();
+  // var state = new GameState();
+  // initGame();
+  // gameState.init();
 
-  gameState.c1.capture(0, PLAYER[0])
-  gameState.d6.capture(0, PLAYER[0])
-  gameState.c2.capture(1, PLAYER[1])
-  gameState.d5.capture(1, PLAYER[1])
+  // var board = new Board()
 
   var prevTime = performance.now();
 
@@ -131,6 +126,8 @@
   var focus, intersects;
   var sightline = new THREE.Raycaster();
   var mouse = new THREE.Vector2();
+
+  window.requestAnimationFrame( animate );
 
   // FPS
   var fps = new Stats();
@@ -171,7 +168,7 @@
     }
 
     update();
-    findIntersects();
+    // findIntersects();
     render();
 
     // End FPS calculation
@@ -200,15 +197,13 @@
       if(gameState[focus.userData.coord].ownedBy !== null) {
         // console.log(focus.userData.coord, ' already owned');
         // console.log(gameState[focus.userData.coord]);
-      }
-      else {
+      } else {
         captureTilesFrom(focus);
         console.log(focus);
         var x = PLAYER[playerTurn];
         socket.emit('click', {player: PLAYER[playerTurn], tile: focus.userData.coord});
       }
-    }
-    else {
+    } else {
       console.log('no tile selected');
     }
   }
@@ -318,8 +313,7 @@
       if(potentialCapture.length && next.ownedBy === playerTurn) {
         toCapture = toCapture.concat(potentialCapture);
         potentialCapture = [];
-      }
-      else {
+      } else {
         potentialCapture = [];
       }
     })
@@ -328,7 +322,7 @@
       tile.capture(playerTurn, PLAYER[playerTurn]);
     })
 
-    playerTurn = 1 - playerTurn;
+    playerTurn = ~~!!!playerTurn;
   }
 
   function lightOpposites(event) {
@@ -372,8 +366,7 @@
       // Enter fullscreen
       requestFullScreen.call(docEl);
       if(enterFS) enterFS();
-    }
-    else {
+    } else {
       if(exitFS) exitFS();
       // Exit fullscreen
       cancelFullScreen.call(doc);
