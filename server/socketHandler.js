@@ -2,79 +2,54 @@ var gameDb = require('../db/gameModel').gameModel;
 var utils = require('./utils');
 var GameState = require('./GameState');
 
-var masterState = new GameState();
-// console.log('masterState.data:', masterState.data);
+module.exports = {
+  createGame: createGame,
+};
 
-function createRoom(roomUrl, io) {
-  return io.of(roomUrl, function(socket) {
-    console.log('connection!', socket.id);
+function createGame(roomId, io) {
+  var game = io.of('/play/' + roomId);
 
-    socket.on('disconnect', function() {
-      console.log('disconnect!', socket.id);
-    })
-  });
+  game.on('connection', registerListeners);
+  game.moves = [];
+  game.gameState = new GameState();
+  game.activePlayer = 0;
 }
 
-function connect(roomUrl, moves, io) {
+function registerListeners(socket) {
+  var game = this;
 
-  // TODO: make singleton task per connection. .of() registers listeners every
-  // time a new connection is made.
-  var room = io.of(roomUrl);
-  // room.moves = [];
-  room.gameState = utils.deepExtend({}, masterState);
-  // console.log('room.gameState.data:', room.gameState.data);
+  /*
+  ========================================
+      On connections
+  ========================================
+   */
 
+  socket.emit('connection', game.moves);
+  socket.broadcast.emit('user connected', socket.id);
 
-  room.once('connection', function(client) {
-    // Send the current state of the board to the client immediately on joining.
+  console.log(socket.id, 'connected to', game.name);
 
-    client.emit('connectSuccess', room.gameState.data);
-    // console.log('room.gameState.data:', room.gameState.data);
+  /*
+  ========================================
+      On game actions
+  ========================================
+   */
 
-    client.on('event', function(data) {
-      // Do some stuff
-      console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!event');
+  socket.on('send move', function(move) {
+    socket.broadcast.emit('receive move', move);
 
-      // Broadcast some stuff to everyone but source
-      // client.broadcast.emit('drag', payload);
-    });
+    game.moves.push(move);
+    game.gameState.capture(move, game.activePlayer);
+    game.activePlayer = ~~!!!game.activePlayer;
+  })
 
-    client.on('click', function(data) {
-      // Do some stuff
-      console.log('click!', data);
+  /*
+  ========================================
+      On disconnections
+  ========================================
+   */
 
-      // Broadcast some stuff to everyone but source
-      client.broadcast.emit('click', data);
-    });
-
-
-    client.on('end', function() {
-      var finishedStroke = client.stroke;
-
-      //Get the game that the client is connected to.
-      var id = client.nsp.name.slice(1);
-
-
-      //Update the game with the new stroke.
-      gameDb.update({roomId: roomId},{$push: {strokes: finishedStroke} },{upsert:true},function(err, board){
-        if(err){ console.log(err); }
-        else {
-          console.log("Successfully added");
-        }
-      });
-
-      // Emit end event to everyone but the person who stopped drawing.
-      client.broadcast.emit('end', null);
-
-      //Delete the stroke object to make room for the next stroke.
-      delete client.stroke;
-    });
-  });
-};
-
-// Required by [server.js](../documentation/server.html)
-module.exports = {
-  connect: connect,
-  createRoom: createRoom,
-
-};
+  socket.on('disconnect', function() {
+    console.log(socket.id, 'disconnected from', game.name);
+  })
+}

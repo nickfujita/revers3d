@@ -47,7 +47,7 @@
       Initialization
   ========================================
    */
-  var render, update;
+  var render, updateControls;
 
   if(isMobile()) {
     var vrButton = document.getElementById('vr-icon');
@@ -64,7 +64,7 @@
     blocker.style.display = 'none';
 
     render = stereo.render.bind( stereo, scene, camera );
-    update = controls.update.bind( controls );
+    updateControls = controls.update.bind( controls );
   } else {
     enablePointerLock();
     window.controls = new THREE.PointerLockControls( camera );
@@ -72,7 +72,7 @@
     scene.add( controls.getObject() );
 
     render = mono.render.bind( mono, scene, camera );
-    update = camera.updateProjectionMatrix.bind( camera );
+    updateControls = camera.updateProjectionMatrix.bind( camera );
   }
 
   /*
@@ -81,31 +81,28 @@
   ========================================
    */
 
-  var socket = io(window.location.href, {some: 'data'});
+  window.board = new Board(new GameState(), PLAYER);
+  var gameState = board.gs;
+  board.draw(scene);
 
+  var socket = io(window.location.pathname, {some: 'data'});
 
-  socket.on('connectSuccess', function(data) {
-    console.log('Joined. Moves so far:', data);
-    var board = new Board(data);
-    scene.add( board );
-
+  socket.on('connection', function(moves) {
+    moves.forEach(function(move) {
+      board.capture(move, playerTurn);
+      playerTurn = ~~!!!playerTurn;
+    })
+    console.log('moves so far:', moves);
   })
 
-  socket.on('click', function(data) {
-    console.log('click', data);
-
-    // gameState[data.tile].capture(playerTurn, data.player);
-    captureTilesFrom(gameState[data.tile].mesh);
+  socket.on('user connected', function(socketId) {
+    console.log(socketId, 'joined your game');
   })
 
-  // var state = new GameState();
-  // initGame();
-  // gameState.init();
-
-  // var board = new Board()
-
-  var prevTime = performance.now();
-
+  socket.on('receive move', function(move) {
+    board.capture(move, playerTurn);
+    playerTurn = ~~!!!playerTurn;
+  })
 
   /*
   ========================================
@@ -141,6 +138,8 @@
   document.body.appendChild( fps.domElement );
   // fps.domElement.style.display = 'none';
 
+  var prevTime = performance.now();
+
   function animate(time) {
     // Begin FPS calculation
     fps.begin();
@@ -167,8 +166,8 @@
       prevTime = time;
     }
 
-    update();
-    // findIntersects();
+    updateControls();
+    findIntersects();
     render();
 
     // End FPS calculation
@@ -194,17 +193,15 @@
     event.stopPropagation();
 
     if(focus) {
-      if(gameState[focus.userData.coord].ownedBy !== null) {
-        // console.log(focus.userData.coord, ' already owned');
-        // console.log(gameState[focus.userData.coord]);
+      var coord = focus.userData.coord;
+
+      if(gameState[coord].ownedBy === null) {
+        board.capture(coord, playerTurn);
+        socket.emit('send move', coord)
+        playerTurn = ~~!!!playerTurn;
       } else {
-        captureTilesFrom(focus);
-        console.log(focus);
-        var x = PLAYER[playerTurn];
-        socket.emit('click', {player: PLAYER[playerTurn], tile: focus.userData.coord});
+        console.log(focus.userData.coord, 'already owned by player', gameState[coord].ownedBy);
       }
-    } else {
-      console.log('no tile selected');
     }
   }
 
@@ -287,67 +284,6 @@
       Helpers
   ========================================
    */
-  function captureTilesFrom(focus) {
-    var tile = gameState[focus.userData.coord];
-    var edges = tile.edges;
-    var toCapture = [tile];
-    var potentialCapture;
-
-    focus.currentHex = PLAYER[playerTurn].color;
-
-    edges.forEach(function(edge, i, edges) {
-      var prev = tile;
-      var next = edge;
-      potentialCapture = [];
-
-      // Loop while the next tile is owned by the opponent, and potentially capture it
-      while (next.ownedBy === (1 - playerTurn)) {
-        next = next.traverse(prev, function(current) {
-          potentialCapture.push(current);
-          prev = current;
-        });
-      }
-
-      // Once the while loop ends, the next tile must either be null or self owned.
-      // If self owned, commit the capture. If null, reject the capture.
-      if(potentialCapture.length && next.ownedBy === playerTurn) {
-        toCapture = toCapture.concat(potentialCapture);
-        potentialCapture = [];
-      } else {
-        potentialCapture = [];
-      }
-    })
-
-    toCapture.forEach(function(tile) {
-      tile.capture(playerTurn, PLAYER[playerTurn]);
-    })
-
-    playerTurn = ~~!!!playerTurn;
-  }
-
-  function lightOpposites(event) {
-    event.stopPropagation();
-
-    if(focus) {
-      var tile = gameState[focus.userData.coord];
-      var edges = tile.edges;
-
-      for (var i = 0; i < edges.length; i++) {
-        var op = (i + (1/2 * edges.length)) % edges.length;
-
-        setTimeout( function(i, op) {
-          gameState[edges[i].coord].light();
-          gameState[edges[op].coord].light();
-
-          setTimeout( function(i, op) {
-            gameState[edges[i].coord].unlight();
-            gameState[edges[op].coord].unlight();
-          }.bind(null, i, op), 1000);
-        }.bind(null, i, op), i * 2000);
-      }
-    }
-  }
-
   function isMobile() {
     try{ document.createEvent("TouchEvent"); return true; }
     catch(e){ return false; }
