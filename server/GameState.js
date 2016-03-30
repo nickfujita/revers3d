@@ -77,7 +77,6 @@ function GameState() {
   /*
   ========================================
       Enumerable tile states
-      TODO: separate this from faces etc.
   ========================================
    */
 
@@ -146,6 +145,7 @@ function GameState() {
   }
 
   this.configure();
+  this.init();
 }
 
 GameState.prototype.init = function() {
@@ -188,6 +188,8 @@ GameState.prototype.capture = function(coord, playerTurn) {
   toCapture.forEach(function(tile) {
     tile.setOwner(playerTurn);
   })
+
+  return toCapture.length;
 }
 
 GameState.prototype.reset = function() {

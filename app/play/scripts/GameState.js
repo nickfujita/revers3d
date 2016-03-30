@@ -79,7 +79,6 @@ function GameState() {
   /*
   ========================================
       Enumerable tile states
-      TODO: separate this from faces etc.
   ========================================
    */
 
