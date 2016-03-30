@@ -1,5 +1,6 @@
 var utils = require('./utils');
 var GameState = require('./GameState');
+var gameDb = require('../db/gameModel').gameModel;
 
 module.exports = {
   createGame: createGame,
@@ -47,27 +48,26 @@ function registerListeners(socket) {
     var turn = game.activePlayer;
 
     // if move is valid:
-    //  1. Add move to the move history (game.moves)
-    //  2. Calculate the change in score (dScore)
+    //  1. Add move to the move history
+    //  2. Calculate the change in score
     //  3. Switch active player
     //  4. Is game over?
     //    4y. Broadcast the score
     //    4n. Broadcast what the move was, whos turn it is, and what the score is
-
     if(socket.id === game.players[turn]) {
       game.moves.push(move);
-      // TODO: Update db
+      gameDb.findOneAndUpdate({roomId: game.id}, {moves: game.moves});
       var dScore = game.gameState.capture(move, turn);
       game.scores[turn] += dScore;
       game.activePlayer = ~~!!!game.activePlayer;
       game.scores[game.activePlayer] -= (dScore - 1);
 
-      if(scores.length === 52) {
+      if(game.scores.length === 52) {
         var message = '';
         var scores = game.scores;
 
         // Arrange scores and generate game over message.
-        if(socket.hasOwnProperty(playerNum)) {
+        if(socket.hasOwnProperty('playerNum')) {
           scores = [game.scores[socket.playerNum], game.scores[!socket.playerNum]];
           if(game.scores[socket.playerNum] > game.scores[!socket.playerNum]) {
             message += 'Congratulations, you win!';
@@ -91,7 +91,7 @@ function registerListeners(socket) {
   ========================================
    */
 
-  if(socket.hasOwnProperty(playerNum)) {
+  if(socket.hasOwnProperty('playerNum')) {
     socket.on('disconnect', function() {
       game.emit('player leave', {playerNum: game.players.indexOf(socket.id), scores: game.scores})
       // console.log(socket.id, 'disconnected from', game.name);
