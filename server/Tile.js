@@ -1,12 +1,16 @@
+if(process) {
+  module.exports = Tile;
+}
 /*
 ========================================
     Tiles (graph nodes)
+
+    Individual surfaces of the game board. Has relationships with other Tiles.
+    Relationships are defined where upper and lowercase of the same letter are opposite.
 ========================================
  */
 
 /**
- * Constructor for individual surface of board. Has relationships with other Tiles.
- * Relationships are defined where upper and lowercase of the same letter are opposite.
  * @param {Boolean} isCorner - Whether or not constructed Tile is a corner
  */
 function Tile(isCorner) {
@@ -28,22 +32,6 @@ Tile.prototype.addEdge = function() {
   this.edges = Array.prototype.slice.call(arguments, 0, end);
 }
 
-Tile.prototype.light = function(color) {
-  color = color || 0x7fff00;
-
-  this.previousColor = this.mesh.material.emissive.getHex();
-  this.mesh.material.emissive.setHex(color);
-}
-
-Tile.prototype.unlight = function(color) {
-  color = color || 0x7fff00;
-
-  this.mesh.material.emissive.setHex(this.previousColor);
-}
-
-Tile.prototype.capture = function(playerNum, color) {
+Tile.prototype.setOwner = function(playerNum, color) {
   this.ownedBy = playerNum;
-  this.light(color);
 }
-
-module.exports = Tile;

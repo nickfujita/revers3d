@@ -1,4 +1,11 @@
-window.getters = (function() {
+if(!window) {
+  var Tile = require('./Tile');
+  var utils = require('./utils')
+
+  module.exports = GameState;
+}
+
+var getters = (function() {
   var _MASTER_DATA = {};
 
   _MASTER_DATA.TILE_WIDTH = 19;
@@ -46,8 +53,15 @@ window.getters = (function() {
   }
 })();
 
+/*
+========================================
+    GameState
+
+    Object which correlates coordinates(pointers) to individual tiles.
+========================================
+ */
+
 /**
- * Game state constructor - establishes the spatial relationships between tiles
  * @param {Number} a Parallel distance to the middle of a face
  * @param {Number} b Perpendicular distance along an axis to the face of the cube
  * @param {Number} c Parallel distance to the middle of an edge
@@ -132,6 +146,8 @@ function GameState() {
       this[prop].coord = prop;
     }
   }
+
+  this.configure();
 }
 
 GameState.prototype.init = function() {
