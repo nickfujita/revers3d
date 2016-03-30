@@ -121,8 +121,12 @@
   })
 
   socket.on('game over', function(data) {
-    alert('Game Over! Final score: ' + data.scores);
+    alert(data.message + ' Final score: ' + data.scores[0] + ' : ' + data.scores[1]);
     // do game over stuff and show rematch/find new games buttons
+  })
+
+  socket.on('player leave', function(data) {
+    alert('Player ' + (data.playerNum + 1) + 'disconnected. Final score: ')
   })
 
   /*
