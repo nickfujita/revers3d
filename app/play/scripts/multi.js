@@ -12,7 +12,7 @@
     }
   ];
 
-  var playerTurn = 0;
+  var turn = 0;
 
   /*
   ========================================
@@ -87,21 +87,31 @@
 
   var socket = io(window.location.pathname, {some: 'data'});
 
-  socket.on('connection', function(moves) {
-    moves.forEach(function(move) {
-      board.capture(move, playerTurn);
-      playerTurn = ~~!!!playerTurn;
-    })
-    console.log('moves so far:', moves);
+  socket.on('connection', function(data) {
+    // Client becomes player if one of the first two to connect to a game.
+    // Otherwise, is spectator.
+    if(data.hasOwnProperty('playerNum')) {
+      Object.defineProperty(window, 'PLAYER_NUM', {
+        value: data.playerNum,
+        writeable: false,
+        enumerable: false
+      })
+      console.log('You are player', data.playerNum + 1);
+    } else {
+      console.log('You are a spectator.');
+
+      data.moves.forEach(function(move) {
+        board.capture(move, data.turn);
+      })
+    }
   })
 
   socket.on('user connected', function(socketId) {
-    console.log(socketId, 'joined your game');
   })
 
-  socket.on('receive move', function(move) {
-    board.capture(move, playerTurn);
-    playerTurn = ~~!!!playerTurn;
+  socket.on('receive move', function(data) {
+    board.capture(data.move, data.turn);
+    turn = ~~!!!data.turn;
   })
 
   /*
@@ -196,11 +206,9 @@
       var coord = focus.userData.coord;
 
       if(gameState[coord].ownedBy === null) {
-        board.capture(coord, playerTurn);
         socket.emit('send move', coord)
-        playerTurn = ~~!!!playerTurn;
       } else {
-        console.log(focus.userData.coord, 'already owned by player', gameState[coord].ownedBy);
+        console.log(focus.userData.coord, 'owned by player', gameState[coord].ownedBy);
       }
     }
   }
@@ -339,34 +347,29 @@
   }
 
   function findIntersects() {
-    sightline.setFromCamera( mouse, camera );
+    if(window.PLAYER_NUM === turn) {
+      sightline.setFromCamera( mouse, camera );
 
-    // calculate board tiles intersecting the picking ray
-    intersects = sightline.intersectObjects( board.children );
+      // calculate board tiles intersecting the picking ray
+      intersects = sightline.intersectObjects( board.children );
 
-    if ( intersects.length > 0 ) { // on focus
-      if ( focus != intersects[ 0 ].object ) { // if focus is on a new object
-        // if ( focus ) focus.material.emissive.setHex( focus.currentHex ); // restore color to old object
-        focus = intersects[ 0 ].object; // Set focus to new object
-        focus.currentHex = focus.material.emissive.getHex(); // remember focused elements color
+      if ( intersects.length > 0 ) { // on focus
+        if ( focus != intersects[ 0 ].object ) { // if focus is on a new object
+          // if ( focus ) focus.material.emissive.setHex( focus.currentHex ); // restore color to old object
+          focus = intersects[ 0 ].object; // Set focus to new object
+          focus.currentHex = focus.material.emissive.getHex(); // remember focused elements color
 
-        if(gameState[focus.userData.coord].ownedBy === null) {
-          focus.material.emissive.setHex( PLAYER[playerTurn].color ); // set focused element to new color
+          if(gameState[focus.userData.coord].ownedBy === null) {
+            focus.material.emissive.setHex( PLAYER[turn].color ); // set focused element to new color
+          }
         }
-        // gameState[focus.userData.coord].edges.forEach(function(edge) {
-        //   edge.mesh.material.emissive.setHex(0x7fff00);
-        // })
-      }
-    } else {
-      if(focus) { // on blur
-        // Restore previous properties of intersection
-        if ( focus ) focus.material.emissive.setHex( focus.currentHex );
+      } else {
+        if(focus) { // on blur
+          // Restore previous properties of intersection
+          if ( focus ) focus.material.emissive.setHex( focus.currentHex );
 
-        // gameState[focus.userData.coord].edges.forEach(function(edge) {
-        //   edge.mesh.material.emissive.setHex(0x000000);
-        // })
-
-        focus = null;
+          focus = null;
+        }
       }
     }
   }

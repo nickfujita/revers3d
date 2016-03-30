@@ -4,10 +4,6 @@
       Game vars
   ========================================
    */
-  // window.board = {
-  //   color: 0x999999,
-  // }
-
   var PLAYER = [
     {
       color: 0xff0000
