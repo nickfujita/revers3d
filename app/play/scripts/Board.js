@@ -169,7 +169,7 @@ Board.prototype.init = function() {
   this.gs.init();
 }
 
-Board.prototype.capture = function(coord, playerNum) {
+Board.prototype.capture = function(coord, playerNum, noAnimate) {
   var tile = this.gs[coord];
   var edges = tile.edges;
   var toCapture = [tile];
@@ -200,12 +200,22 @@ Board.prototype.capture = function(coord, playerNum) {
   })
 
   var currentBoard = this;
-  toCapture.forEach(function(tile, i) {
+
+  var captureMode = noAnimate ? capture : captureAnimated;
+  toCapture.forEach(captureMode);
+
+  function captureAnimated(tile, i) {
     tile.setOwner(playerNum);
     tile.mesh.currentHex = capColor;
     // Light captured tiles on a delay for visual appeal
     setTimeout( function() {
       currentBoard.light(tile.coord, capColor);
     }, i * 50);
-  })
+  }
+
+  function capture(tile) {
+    tile.setOwner(playerNum);
+    tile.mesh.currentHex = capColor;
+    currentBoard.light(tile.coord, capColor);
+  }
 }

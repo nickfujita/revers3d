@@ -96,14 +96,18 @@
         writeable: false,
         enumerable: false
       })
+
       console.log('You are player', data.playerNum + 1);
     } else {
       console.log('You are a spectator.');
-
-      data.moves.forEach(function(move) {
-        board.capture(move, data.turn);
-      })
     }
+
+    turn = data.turn;
+    var i = 0;
+    data.moves.forEach(function(move) {
+      board.capture(move, i, true);
+      i = ~~!!!i;
+    })
   })
 
   socket.on('user connected', function(socketId) {
@@ -112,6 +116,13 @@
   socket.on('receive move', function(data) {
     board.capture(data.move, data.turn);
     turn = ~~!!!data.turn;
+    var scores = data.scores;
+    console.log('scores', scores);
+  })
+
+  socket.on('game over', function(data) {
+    alert('Game Over! Final score: ' + data.scores);
+    // do game over stuff and show rematch/find new games buttons
   })
 
   /*
