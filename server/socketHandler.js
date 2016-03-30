@@ -13,6 +13,7 @@ function createGame(roomId, io) {
   game.moves = [];
   game.gameState = new GameState();
   game.activePlayer = 0;
+  game.players = [];
 }
 
 function registerListeners(socket) {
@@ -24,10 +25,15 @@ function registerListeners(socket) {
   ========================================
    */
 
-  socket.emit('connection', game.moves);
-  socket.broadcast.emit('user connected', socket.id);
 
-  console.log(socket.id, 'connected to', game.name);
+  if(game.players.length < 2) {
+    socket.emit('connection', {playerNum: game.players.length});
+    game.players.push(socket.id);
+  } else {
+    socket.emit('connection', {moves: game.moves, turn: game.activePlayer});
+  }
+
+  socket.broadcast.emit('user connected', socket.id);
 
   /*
   ========================================
@@ -36,11 +42,15 @@ function registerListeners(socket) {
    */
 
   socket.on('send move', function(move) {
-    socket.broadcast.emit('receive move', move);
+    var turn = game.activePlayer;
 
-    game.moves.push(move);
-    game.gameState.capture(move, game.activePlayer);
-    game.activePlayer = ~~!!!game.activePlayer;
+    if(socket.id === game.players[turn]) {
+      game.moves.push(move);
+      game.gameState.capture(move, turn);
+      game.emit('receive move', {move: move, turn: turn});
+
+      game.activePlayer = ~~!!!game.activePlayer;
+    }
   })
 
   /*
