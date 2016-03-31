@@ -7,7 +7,7 @@ module.exports = {
 };
 
 function createGame(roomId, io) {
-  var game = io.of('/play/' + roomId);
+  var game = io.of('/game/' + roomId);
   game.on('connection', registerListeners);
 
   game.id = roomId;
@@ -32,6 +32,9 @@ function registerListeners(socket) {
     startData.playerNum = socket.playerNum = game.players.length;
     socket.emit('connection', startData);
     game.players.push(socket.id);
+    gameDb.findOneAndUpdate({roomId: game.id}, {players: game.players}, function(err) {
+      if(err) console.error('DB error adding player', err);
+    });
   } else {
     socket.emit('connection', startData);
   }
@@ -56,7 +59,9 @@ function registerListeners(socket) {
     //    4n. Broadcast what the move was, whos turn it is, and what the score is
     if(socket.id === game.players[turn]) {
       game.moves.push(move);
-      gameDb.findOneAndUpdate({roomId: game.id}, {moves: game.moves});
+      gameDb.findOneAndUpdate({roomId: game.id}, {moves: game.moves}, function(err){
+        if(err) console.error('DB error updating moves', err);
+      });
       var dScore = game.gameState.capture(move, turn);
       game.scores[turn] += dScore;
       game.activePlayer = ~~!!!game.activePlayer;
@@ -93,8 +98,17 @@ function registerListeners(socket) {
 
   if(socket.hasOwnProperty('playerNum')) {
     socket.on('disconnect', function() {
-      game.emit('player leave', {playerNum: game.players.indexOf(socket.id), scores: game.scores})
-      // console.log(socket.id, 'disconnected from', game.name);
+      var playerNum = game.players.indexOf(socket.id);
+      game.emit('player leave', {playerNum: playerNum, scores: game.scores});
+      game.players.splice(playerNum, 1);
+
+      // If there are no players left, remove the game from the collection.
+      if(!game.players.length) {
+        game.players = [game.players[!playerNum]];
+        gameDb.remove({roomId: game.id}, function(err) {
+          if(err) console.error('DB error deleting game', err);
+        });
+      }
     })
   }
 }
