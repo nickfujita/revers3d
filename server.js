@@ -26,15 +26,28 @@ app.get('/', function(req, res) {
   res.sendFile(__dirname + '/app/index.html');
 });
 
-app.get('/join', function(req, res) {
-  res.sendFile(__dirname + '/app/lobby/index.html');
-});
-
-// Create a new game room
+// Create a public game room
 app.get('/new', function(req, res) {
   var roomId = utils.randStr(4);
 
   var game = new gameDb({roomId: roomId, moves: [], private: false, players: []});
+
+  game.save(function(err, game) {
+    if(game) {
+      sockets.createGame(game.roomId, io);
+      res.redirect('/game/' + game.roomId);
+    } else {
+      console.error("Error creating new game.", err);
+      res.redirect('/');
+    }
+  });
+});
+
+// Create a private game room
+app.get('/create', function(req, res) {
+  var roomId = utils.randStr(4);
+
+  var game = new gameDb({roomId: roomId, moves: [], private: true, players: []});
 
   game.save(function(err, game) {
     if(game) {
@@ -69,14 +82,14 @@ app.get('/play', function(req, res) {
   gameDb.find({players: {$size: 1}, private: false}, function(err, docs) {
     if(err) {
       console.error('DB error finding game to join.', err);
-      redirect('/');
+      res.redirect('/');
     }
 
     if(docs.length) {
       var randGame = docs[Math.floor(Math.random() * docs.length)];
       res.redirect('/game/' + randGame.roomId);
     } else {
-      redirect('/new');
+      res.redirect('/new');
     }
   });
 });
@@ -86,14 +99,14 @@ app.get('/watch', function(req, res) {
   gameDb.find({players: {$size: 2}, private: false}, function(err, docs) {
     if(err) {
       console.error('DB error finding game to watch.', err);
-      redirect('/');
+      res.redirect('/');
     }
 
     if(docs.length) {
       var randGame = docs[Math.floor(Math.random() * docs.length)];
       res.redirect('/game/' + randGame.roomId);
     } else {
-      redirect('/');
+      res.redirect('/');
     }
   })
 });
