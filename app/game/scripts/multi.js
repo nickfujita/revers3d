@@ -381,7 +381,7 @@
       } else {
         if(focus) { // on blur
           // Restore previous properties of intersection
-          if ( focus ) focus.material.emissive.setHex( focus.currentHex );
+          focus.material.emissive.setHex( focus.currentHex );
 
           focus = null;
         }

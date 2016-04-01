@@ -1,75 +1,94 @@
-// function allCombos(remaining, init) {
-//   var objSoFar = {};
+/**
+* @param {string[][]} tickets
+* @return {string[]}
+*/
 
-//   if(remaining.length) {
-//     for(var i = 0; i < remaining.length; i++) {
-//       var r = allCombos(remaining.slice(0, i).concat(remaining.slice(i+1)), init);
-//       objSoFar[remaining[i]] = r;
-//       objSoFar[-remaining[i]] = r;
-//     }
-//   }
-//   else {
-//     objSoFar = init;
-//   }
-
-//   return objSoFar;
-// }
-
-// function deepExtend(target, source) {
-//   var sources = Array.prototype.slice.call(arguments, 1);
-
-//   for(var i = 0; i < sources.length; i++) {
-//     for(var key in sources[i]) {
-//       if(target.hasOwnProperty(key) && typeof sources[i][key] === 'object') {
-//         deepExtend(target[key], sources[i][key]);
-//       }
-//       else {
-//         target[key] = sources[i][key];
-//       }
-//     }
-//   }
-
-//   return target;
-// }
-
-// function sum() { // sum(3)(4)() === 7;
-//   var total = 0;
-//   if(arguments[0]) {
-//     total += arguments[0];
-//     return sum;
-//   }
-//   else return total += sum;
-// }
-
-// console.log(sum(3)(4)());
-
-// var str = 'Backbone, d3, Mongoose, SQL, mysql, sqlite, Sequelize, ES6, Gulp, socket.io, Mocha, Chai, levelDB, Material Design';
-
-// function alphabetize(str) {
-//   console.log('str.split(',')[0]:', str.split(',')[0]);
-
-//   return str.split(', ').sort(function(a, b) {
-//     var A = a.toLowerCase();
-//     var B = b.toLowerCase();
-//     if (A < B){
-//       return -1;
-//     }else if (A > B){
-//       return  1;
-//     }else{
-//       return 0;
-//     }
-//   }).join(', ');
-// }
-
-// var x = alphabetize(str);
-// console.log('x:', x);
-
-// a-g, 1-8
-
-var str = 'abcdefg'
-
-for (var i = 0; i < str.length; i++) {
-  for (var j = 1; j <= 8; j++) {
-    console.log('this.' + str[i] + j + " = ");
-  }
+var numInstances = function (arr, str) {
+   return arr.reduce(function(memo, current) {
+       if (current === str) {
+           return memo + 1;
+       }
+       return memo;
+   }, 0);
 }
+
+var concatTo = function (prepend) {
+   return function (append) {
+       return prepend.concat(append);
+   };
+};
+
+var lexicalSort = function (a, b) {
+ return a > b;
+};
+
+var pushTo = function (arr) {
+   return function (item) {
+       arr.push(item);
+   };
+};
+
+var findItinerary = function(tickets) {
+   var ITINERARY_LENGTH = tickets.length + 1;
+
+   if (tickets.length === 0) return [];
+
+   var availableDest = function (outbound, dest) {
+       return outbound && outbound.indexOf(dest) === -1;
+   };
+
+   var hasAvailableVisits = function (tripSoFar) {
+       return function (dest) {
+           return numInstances(tripSoFar, dest) < numConnectionsTo[dest];
+       }
+   };
+
+   var numConnectionsTo = {};
+   var connectingFlights = {};
+   tickets.forEach(function(ticket) {
+       var from    = ticket[0],
+           to      = ticket[1];
+       if (availableDest(connectingFlights[from], to)) {
+           connectingFlights[from].push(to);
+       } else {
+           connectingFlights[from] = connectingFlights[from] ? connectingFlights[from] : [to];
+       }
+       numConnectionsTo[to] = ~~numConnectionsTo[to] + 1;
+   });
+   console.log('connectingFlights:', connectingFlights);
+
+
+   var queue = [ ["JFK"] ];
+
+   var count = 0;
+
+   while (queue[0] && count++ < 100000) {
+       var tripSoFar = queue.shift();
+       var lastStop = tripSoFar[tripSoFar.length - 1];
+       var outbound = connectingFlights[lastStop];
+       // console.log('tripSoFar.length, tripSoFar.length < ITINERARY_LENGTH:', tripSoFar.length, tripSoFar.length < ITINERARY_LENGTH);
+
+       if (tripSoFar.length === ITINERARY_LENGTH) {
+           return tripSoFar;
+       }
+       if (outbound) {
+           outbound
+               .sort(lexicalSort)
+               .filter(hasAvailableVisits(tripSoFar))
+               .map(concatTo(tripSoFar))
+               .forEach(pushTo(queue));
+       }
+       // console.log('queue[0]:', queue[0]);
+
+   }
+
+   console.log('ITINERARY_LENGTH:', ITINERARY_LENGTH);
+};
+
+var infItin = [["EZE","TIA"],["EZE","HBA"],["AXA","TIA"],["JFK","AXA"],["ANU","JFK"],["ADL","ANU"],["TIA","AUA"],["ANU","AUA"],["ADL","EZE"],["ADL","EZE"],["EZE","ADL"],["AXA","EZE"],["AUA","AXA"],["JFK","AXA"],["AXA","AUA"],["AUA","ADL"],["ANU","EZE"],["TIA","ADL"],["EZE","ANU"],["AUA","ANU"]]
+
+// var brokenItin = [['JFK', 'SFO'], ['SFO', 'SJC'], ['SJC', 'DFW'], ['DFW', 'CLE'], ['CLE', 'SJC'], ['SJC', 'LAX']];
+
+var fourteen = [['JFK', 'SJC'],['SJC', 'SFO'],['SFO', 'SJC'],['SJC', 'SFO'],['SFO', 'SJC'],['SJC', 'SFO'],['SFO', 'SJC'],['SJC', 'SFO'],['SFO', 'SJC'],['SJC', 'SFO'],['SFO', 'SJC'],['SJC', 'SFO'],['SFO', 'SJC']]
+
+console.log('RESULT', findItinerary(infItin));
