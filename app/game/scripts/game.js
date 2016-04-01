@@ -107,10 +107,10 @@
       Initialize gameplay
   ========================================
    */
-   window.board = new Board(new GameState(), PLAYER);
-   var gameState = board.gs;
+  window.board = new Board(new GameState(), PLAYER);
+  var gameState = board.gs;
 
-   board.draw(scene);
+  board.draw(scene);
 
   if(window.hasOwnProperty('isMultiplayer')) initMultiplayer();
 
