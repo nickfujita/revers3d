@@ -77,7 +77,7 @@
 
   /*
   ========================================
-      Sockets
+      Initialize Gameplay
   ========================================
    */
 
@@ -85,49 +85,7 @@
   var gameState = board.gs;
   board.draw(scene);
 
-  var socket = io(window.location.pathname, {some: 'data'});
-
-  socket.on('connection', function(data) {
-    // Client becomes player if one of the first two to connect to a game.
-    // Otherwise, is spectator.
-    if(data.hasOwnProperty('playerNum')) {
-      Object.defineProperty(window, 'PLAYER_NUM', {
-        value: data.playerNum,
-        writeable: false,
-        enumerable: false
-      })
-
-      console.log('You are player', data.playerNum + 1);
-    } else {
-      console.log('You are a spectator.');
-    }
-
-    turn = data.turn;
-    var i = 0;
-    data.moves.forEach(function(move) {
-      board.capture(move, i, true);
-      i = ~~!!!i;
-    })
-  })
-
-  socket.on('user connected', function(socketId) {
-  })
-
-  socket.on('receive move', function(data) {
-    board.capture(data.move, data.turn);
-    turn = ~~!!!data.turn;
-    var scores = data.scores;
-    console.log('scores', scores);
-  })
-
-  socket.on('game over', function(data) {
-    alert(data.message + ' Final score: ' + data.scores[0] + ' : ' + data.scores[1]);
-    // do game over stuff and show rematch/find new games buttons
-  })
-
-  socket.on('player leave', function(data) {
-    alert('Player ' + (data.playerNum + 1) + 'disconnected. Final score: ')
-  })
+  if(window.hasOwnProperty(isMultiplayer)) initMultiplayer();
 
   /*
   ========================================
@@ -387,6 +345,52 @@
         }
       }
     }
+  }
+
+  function initMultiplayer() {
+    var socket = io(window.location.pathname, {some: 'data'});
+
+    socket.on('connection', function(data) {
+      // Client becomes player if one of the first two to connect to a game.
+      // Otherwise, is spectator.
+      if(data.hasOwnProperty('playerNum')) {
+        Object.defineProperty(window, 'PLAYER_NUM', {
+          value: data.playerNum,
+          writeable: false,
+          enumerable: false
+        })
+
+        console.log('You are player', data.playerNum + 1);
+      } else {
+        console.log('You are a spectator.');
+      }
+
+      turn = data.turn;
+      var i = 0;
+      data.moves.forEach(function(move) {
+        board.capture(move, i, true);
+        i = ~~!!!i;
+      })
+    })
+
+    socket.on('user connected', function(socketId) {
+    })
+
+    socket.on('receive move', function(data) {
+      board.capture(data.move, data.turn);
+      turn = ~~!!!data.turn;
+      var scores = data.scores;
+      console.log('scores', scores);
+    })
+
+    socket.on('game over', function(data) {
+      alert(data.message + ' Final score: ' + data.scores[0] + ' : ' + data.scores[1]);
+      // do game over stuff and show rematch/find new games buttons
+    })
+
+    socket.on('player leave', function(data) {
+      alert('Player ' + (data.playerNum + 1) + 'disconnected. Final score: ')
+    })
   }
 
 })();
