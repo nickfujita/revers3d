@@ -1,4 +1,5 @@
 (function() {
+  var isMobile = checkMobile();
   /*
   ========================================
       Game vars
@@ -19,7 +20,7 @@
       Scene Setup
   ========================================
    */
-  window.scene = new THREE.Scene();
+  var scene = new THREE.Scene();
   scene.fog = new THREE.Fog( 0xffffff, 0, 750 );
 
   var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -35,47 +36,71 @@
   mono.setSize( window.innerWidth, window.innerHeight );
   document.body.appendChild( mono.domElement );
 
-  // Register event listeners
   // window.addEventListener('deviceorientation', setOrientationControls, true);
-  window.addEventListener( 'resize', onWindowResize, false );
-  document.addEventListener( 'click', onClick, false );
-  document.addEventListener( 'keydown', onKeyDown, false );
-  document.addEventListener( 'keyup', onKeyUp, false );
+
 
   /*
   ========================================
       Initialize controls
   ========================================
    */
-  var render, update;
+  var render, update, controls;
 
-  if(isMobile()) {
-    var vrButton = document.getElementById('vr-icon');
-    var screenButton = document.getElementById('screen-icon');
-    vrButton.style.display = "block";
-    vrButton.addEventListener( 'click', toggleFullScreen.bind(null, enterVR, exitVR), false );
-    screenButton.addEventListener( 'click', toggleFullScreen.bind(null, enterVR, exitVR), false );
+  if(isMobile) {
+    controls = new THREE.TapTouchControls( camera );
 
-    window.controls = new THREE.DeviceOrientationControls(camera, true);
+    var PI_2 = Math.PI / 2;
+    var xStart, yStart;
+    var tapStart;
+    var yaw = controls.yawObject;
+    var pitch = controls.pitchObject;
 
-    var stereo = new THREE.StereoEffect(mono);
+    document.addEventListener( 'touchstart', onTouchStart, false );
+    document.addEventListener( 'touchmove', onTouchMove, false );
+    document.addEventListener( 'touchend', onTouchEnd, false );
 
-    instructions.style.display = 'none';
-    blocker.style.display = 'none';
-
-    render = stereo.render.bind( stereo, scene, camera );
-    update = controls.update.bind( controls );
   } else {
-    enablePointerLock();
-    window.controls = new THREE.PointerLockControls( camera );
-    controls.getObject().position.y = 0;
-    scene.add( controls.getObject() );
+    controls = new THREE.PointerLockControls( camera );
 
-    render = mono.render.bind( mono, scene, camera );
-    update = camera.updateProjectionMatrix.bind( camera );
+    window.addEventListener( 'resize', onWindowResize, false );
+    document.addEventListener( 'click', onClick, false );
+    document.addEventListener( 'keydown', onKeyDown, false );
+    document.addEventListener( 'keyup', onKeyUp, false );
+
+    allowPointerLock(controls);
   }
 
-  window.requestAnimationFrame( animate );
+  controls.getObject().position.y = 0;
+  scene.add( controls.getObject() );
+
+  render = mono.render.bind( mono, scene, camera );
+  update = camera.updateProjectionMatrix.bind( camera );
+
+  // if(isMobile()) {
+  //   var vrButton = document.getElementById('vr-icon');
+  //   var screenButton = document.getElementById('screen-icon');
+  //   vrButton.style.display = "block";
+  //   vrButton.addEventListener( 'click', toggleFullScreen.bind(null, enterVR, exitVR), false );
+  //   screenButton.addEventListener( 'click', toggleFullScreen.bind(null, enterVR, exitVR), false );
+
+  //   window.controls = new THREE.DeviceOrientationControls(camera, true);
+
+  //   var stereo = new THREE.StereoEffect(mono);
+
+  //   instructions.style.display = 'none';
+  //   blocker.style.display = 'none';
+
+  //   render = stereo.render.bind( stereo, scene, camera );
+  //   update = controls.update.bind( controls );
+  // } else {
+  //   enablePointerLock();
+  //   window.controls = new THREE.PointerLockControls( camera );
+  //   controls.getObject().position.y = 0;
+  //   scene.add( controls.getObject() );
+
+  //   render = mono.render.bind( mono, scene, camera );
+  //   update = camera.updateProjectionMatrix.bind( camera );
+  // }
 
   /*
   ========================================
@@ -107,6 +132,8 @@
   var sightline = new THREE.Raycaster();
   var mouse = new THREE.Vector2();
 
+  window.requestAnimationFrame( animate );
+
   // FPS
   var fps = new Stats();
   fps.setMode( 0 ); // 0: fps, 1: ms, 2: mb
@@ -126,7 +153,7 @@
     fps.begin();
 
     // Allow movement for development
-    if ( !stereo ) {
+    if ( !isMobile ) {
       var delta = ( time - prevTime ) / 1000;
 
       velocity.x -= velocity.x * 10.0 * delta;
@@ -183,6 +210,52 @@
       }
     } else {
       console.log('no tile selected');
+    }
+  }
+
+  function onTouchStart( event ) {
+    event.preventDefault();
+    console.log('start!');
+    if ( event.touches.length === 1 ) {
+      // document.addEventListener( 'touchmove', onTouchMove, false );
+
+      xStart = event.touches[ 0 ].pageX;
+      yStart = event.touches[ 0 ].pageY;
+
+      tapStart = Date.now();
+    }
+  }
+
+  function onTouchMove( event ) {
+    event.preventDefault();
+    if ( event.touches.length === 1 ) {
+      // document.addEventListener( 'touchend', onTouchEnd, false );
+      var xEnd = event.touches[ 0 ].pageX;
+      var yEnd = event.touches[ 0 ].pageY;
+
+      var dx = xEnd - xStart;
+      var dy = yEnd - yStart;
+
+      yaw.rotation.y += 0.005 * dx;
+      xStart += dx;
+
+      pitch.rotation.x += 0.005 * dy;
+      pitch.rotation.x = Math.max( - PI_2, Math.min( PI_2, pitch.rotation.x ) );
+      yStart += dy;
+    }
+  };
+
+  function onTouchEnd( event ) {
+    event.preventDefault();
+    // document.removeEventListener( 'touchmove', onTouchMove, false );
+
+    var isClick = Date.now() - tapStart < 150;
+
+    if(isClick) {
+      onClick(event);
+      console.log('click!');
+    } else {
+      console.log('hold!');
     }
   }
 
@@ -265,7 +338,7 @@
       Helpers
   ========================================
    */
-  function isMobile() {
+  function checkMobile() {
     try{ document.createEvent("TouchEvent"); return true; }
     catch(e){ return false; }
   }
@@ -335,18 +408,11 @@
         if(gameState[focus.userData.coord].ownedBy === null) {
           focus.material.emissive.setHex( PLAYER[playerTurn].color ); // set focused element to new color
         }
-        // gameState[focus.userData.coord].edges.forEach(function(edge) {
-        //   edge.mesh.material.emissive.setHex(0x7fff00);
-        // })
       }
     } else {
       if(focus) { // on blur
         // Restore previous properties of intersection
         focus.material.emissive.setHex( focus.currentHex );
-
-        // gameState[focus.userData.coord].edges.forEach(function(edge) {
-        //   edge.mesh.material.emissive.setHex(0x000000);
-        // })
 
         focus = null;
       }

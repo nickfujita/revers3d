@@ -1,6 +1,10 @@
-window.enablePointerLock = function() {
+function allowPointerLock(controls) {
   var blocker = document.getElementById( 'blocker' );
   var instructions = document.getElementById( 'instructions' );
+
+  blocker.style.display = '-webkit-box';
+  blocker.style.display = '-moz-box';
+  blocker.style.display = 'box';
 
   // http://www.html5rocks.com/en/tutorials/pointerlock/intro/
   var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
