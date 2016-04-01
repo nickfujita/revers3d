@@ -13,36 +13,6 @@ THREE.TapTouchControls = function ( camera ) {
   this.yawObject = new THREE.Object3D();
   this.yawObject.add( this.pitchObject );
 
-  // this.onTouchStart = (function( event ) {}).bind(this);
-  // this.onTouchMove = (function( event ) {}).bind(this);
-  // this.onTouchEnd = (function( event ) {}).bind(this);
-
-
-
-  // this.registerTouchStart = function( cb ) {
-  //   onTouchStart = cb.bind(scope);
-  //   document.addEventListener( 'touchstart', function(event) {
-  //     onTouchStart(event);
-  //     if(scope.onTouchMove) {
-  //       document.addEventListener( 'touchmove', onTouchMove, false );
-  //     }
-  //   }, false );
-  // }
-
-  // this.registerTouchMove = function( cb ) {
-  //   onTouchMove = cb.bind(scope);
-  // }
-
-  // this.registerTouchEnd = function( cb ) {
-  //   onTouchEnd = cb.bind(scope);
-  //   document.addEventListener( 'touchend', onTouchEnd, false );
-  // }
-
-  // this.dispose = function() {
-  //   document.removeEventListener( 'touchstart', onTouchStart, false );
-  // };
-
-
 	this.getObject = function () {
 		return this.yawObject;
 	};
