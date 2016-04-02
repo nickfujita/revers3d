@@ -102,11 +102,15 @@ function registerListeners(socket) {
       game.emit('player leave', {playerNum: playerNum, scores: game.scores});
       game.players.splice(playerNum, 1);
 
+
       // If there are no players left, remove the game from the collection.
-      if(!game.players.length) {
-        game.players = [game.players[!playerNum]];
+      if(!game.players.length && game.moves.length) {
         gameDb.remove({roomId: game.id}, function(err) {
           if(err) console.error('DB error deleting game', err);
+        });
+      } else {
+        gameDb.findOneAndUpdate({roomId: game.id}, {players: game.players}, function(err) {
+          if(err) console.error('DB error removing player', err);
         });
       }
     })
