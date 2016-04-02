@@ -17,7 +17,7 @@
     "grunt": "^0.4.5",
     "mongo": "^0.1.0",
     "mongoose": "^4.4.10",
-    "socket.io": "^1.4.5",
+    "socket.io": "^1.4.5"
   },
   "devDependencies": {
     "grunt-contrib-concat": "^0.5.1",
