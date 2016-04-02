@@ -228,7 +228,6 @@
 
   function onTouchEnd( event ) {
     event.preventDefault();
-    console.log('event:', event);
 
     var isClick = Date.now() - tapStart < 150;
 
@@ -326,7 +325,6 @@
 
   function toggleFSVR(event) {
     event.stopPropagation();
-    console.log('hello');
 
     var doc = window.document;
     var docEl = doc.documentElement;
@@ -398,8 +396,6 @@
     socket = io(window.location.pathname, {some: 'data'});
 
     socket.on('connection', function(data) {
-      console.log('connection');
-
       // Client becomes player if one of the first two to connect to a game.
       // Otherwise, is spectator.
       if(data.hasOwnProperty('playerNum')) {
