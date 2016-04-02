@@ -1,10 +1,12 @@
 (function() {
-  var isMobile = checkMobile();
   /*
   ========================================
-      Game vars
+      App State
   ========================================
    */
+
+  var isMobile = checkMobile();
+  var turn = 0;
   var PLAYER = [
     {
       color: 0xff0000
@@ -12,8 +14,6 @@
       color: 0x1e09ff
     }
   ];
-
-  var playerTurn = 0;
 
   /*
   ========================================
@@ -36,7 +36,7 @@
   mono.setSize( window.innerWidth, window.innerHeight );
   document.body.appendChild( mono.domElement );
 
-  // window.addEventListener('deviceorientation', setOrientationControls, true);
+  var stereo = new THREE.StereoEffect(mono);
 
 
   /*
@@ -46,61 +46,44 @@
    */
   var render, update, controls;
 
-  if(isMobile) {
-    controls = new THREE.TapTouchControls( camera );
+  window.addEventListener( 'resize', onWindowResize, false );
+  document.addEventListener( 'click', onClick, false );
 
-    var PI_2 = Math.PI / 2;
-    var xStart, yStart;
-    var tapStart;
-    var yaw = controls.yawObject;
-    var pitch = controls.pitchObject;
+  var fsButton = document.getElementById('fs-icon');
+  // var screenButton = document.getElementById('screen-icon');
+  // vrButton.style.display = "block";
+  fsButton.addEventListener( 'click', toggleFSVR, false );
+  // screenButton.addEventListener( 'click', toggleFSVR, false );
+  fsButton.addEventListener( 'touchstart', toggleFSVR, false );
+  // screenButton.addEventListener( 'touchstart', toggleFSVR, false );
+
+  if(isMobile) {
+    controls = new THREE.DeviceOrientationControls( camera );
+
+    // var PI_2 = Math.PI / 2;
+    // var xStart, yStart;
+    // var tapStart;
+    // var yaw = controls.yawObject;
+    // var pitch = controls.pitchObject;
 
     document.addEventListener( 'touchstart', onTouchStart, false );
-    document.addEventListener( 'touchmove', onTouchMove, false );
+    // document.addEventListener( 'touchmove', onTouchMove, false );
     document.addEventListener( 'touchend', onTouchEnd, false );
 
+    render = stereo.render.bind( stereo, scene, camera );
+    update = controls.update.bind( controls );
   } else {
     controls = new THREE.PointerLockControls( camera );
 
-    window.addEventListener( 'resize', onWindowResize, false );
-    document.addEventListener( 'click', onClick, false );
     document.addEventListener( 'keydown', onKeyDown, false );
     document.addEventListener( 'keyup', onKeyUp, false );
 
     allowPointerLock(controls);
+    render = mono.render.bind( mono, scene, camera );
+    update = camera.updateProjectionMatrix.bind( camera );
+    scene.add( controls.getObject() );
   }
 
-  controls.getObject().position.y = 0;
-  scene.add( controls.getObject() );
-
-  render = mono.render.bind( mono, scene, camera );
-  update = camera.updateProjectionMatrix.bind( camera );
-
-  // if(isMobile()) {
-  //   var vrButton = document.getElementById('vr-icon');
-  //   var screenButton = document.getElementById('screen-icon');
-  //   vrButton.style.display = "block";
-  //   vrButton.addEventListener( 'click', toggleFullScreen.bind(null, enterVR, exitVR), false );
-  //   screenButton.addEventListener( 'click', toggleFullScreen.bind(null, enterVR, exitVR), false );
-
-  //   window.controls = new THREE.DeviceOrientationControls(camera, true);
-
-  //   var stereo = new THREE.StereoEffect(mono);
-
-  //   instructions.style.display = 'none';
-  //   blocker.style.display = 'none';
-
-  //   render = stereo.render.bind( stereo, scene, camera );
-  //   update = controls.update.bind( controls );
-  // } else {
-  //   enablePointerLock();
-  //   window.controls = new THREE.PointerLockControls( camera );
-  //   controls.getObject().position.y = 0;
-  //   scene.add( controls.getObject() );
-
-  //   render = mono.render.bind( mono, scene, camera );
-  //   update = camera.updateProjectionMatrix.bind( camera );
-  // }
 
   /*
   ========================================
@@ -109,6 +92,7 @@
    */
   window.board = new Board(new GameState(), PLAYER);
   var gameState = board.gs;
+  var socket;
 
   board.draw(scene);
 
@@ -197,6 +181,7 @@
     camera.updateProjectionMatrix();
 
     mono.setSize( window.innerWidth, window.innerHeight );
+    stereo.setSize( window.innerWidth, window.innerHeight );
   }
 
   function onClick( event ) {
@@ -204,22 +189,17 @@
 
     if(focus) {
       var coord = focus.userData.coord;
+
       if(gameState[coord].ownedBy === null) {
-        board.capture(coord, playerTurn);
-        playerTurn = ~~!!!playerTurn;
+        socket.emit('send move', coord)
       } else {
-        console.log(focus.userData.coord, 'already owned by player', gameState[coord].ownedBy);
+        console.log(focus.userData.coord, 'owned by player', gameState[coord].ownedBy);
       }
-    } else {
-      console.log('no tile selected');
     }
   }
 
   function onTouchStart( event ) {
-    event.preventDefault();
-    console.log('start!');
     if ( event.touches.length === 1 ) {
-      // document.addEventListener( 'touchmove', onTouchMove, false );
 
       xStart = event.touches[ 0 ].pageX;
       yStart = event.touches[ 0 ].pageY;
@@ -229,9 +209,8 @@
   }
 
   function onTouchMove( event ) {
-    event.preventDefault();
     if ( event.touches.length === 1 ) {
-      // document.addEventListener( 'touchend', onTouchEnd, false );
+      event.preventDefault();
       var xEnd = event.touches[ 0 ].pageX;
       var yEnd = event.touches[ 0 ].pageY;
 
@@ -249,7 +228,6 @@
 
   function onTouchEnd( event ) {
     event.preventDefault();
-    // document.removeEventListener( 'touchmove', onTouchMove, false );
 
     var isClick = Date.now() - tapStart < 150;
 
@@ -345,7 +323,7 @@
     catch(e){ return false; }
   }
 
-  function toggleFullScreen(enterFS, exitFS, event) {
+  function toggleFSVR(event) {
     event.stopPropagation();
 
     var doc = window.document;
@@ -357,72 +335,65 @@
     if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
       // Enter fullscreen
       requestFullScreen.call(docEl);
-      if(enterFS) enterFS();
     }
     else {
-      if(exitFS) exitFS();
       // Exit fullscreen
       cancelFullScreen.call(doc);
     }
+
+    // if(wasFs()) { enterVR(); }
+    // else { exitVR(); }
+  }
+
+  function wasFs() {
+    return document.fullscreenEnabled || document.mozFullscreenEnabled || document.webkitIsFullScreen ? false : true;
   }
 
   function enterVR() {
     vrButton.style.display = "none";
     screenButton.style.display = "block";
 
-    // scene.remove( controls.getObject() );
-    // vrButton.style.display = "block";
-    // screenButton.style.display = "none";
-
-    // controls = new THREE.DeviceOrientationControls(camera, true);
-    // stereo = new THREE.StereoEffect(mono);
-
-    // render = stereo.render.bind( stereo, scene, camera );
-    // update = controls.update.bind( controls );
+    render = stereo.render.bind( stereo, scene, camera );
   }
 
   function exitVR() {
     vrButton.style.display = "block";
     screenButton.style.display = "none";
 
-    // vrButton.style.display = "none";
-    // screenButton.style.display = "block";
-
-    // controls = new THREE.PointerLockControls( camera );
-    // scene.add( controls.getObject() );
-
-    // render = mono.render.bind( mono, scene, camera );
-    // update = camera.updateProjectionMatrix.bind( camera );
+    mono.setSize( window.innerWidth, window.innerHeight );
+    render = mono.render.bind( mono, scene, camera );
   }
 
   function findIntersects() {
-    sightline.setFromCamera( mouse, camera );
+    if(window.PLAYER_NUM === turn) {
+      sightline.setFromCamera( mouse, camera );
 
-    // calculate board tiles intersecting the picking ray
-    intersects = sightline.intersectObjects( board.children );
+      // calculate board tiles intersecting the picking ray
+      intersects = sightline.intersectObjects( board.children );
 
-    if ( intersects.length > 0 ) { // on focus
-      if ( focus != intersects[ 0 ].object ) { // if focus is on a new object
-        // if ( focus ) focus.material.emissive.setHex( focus.currentHex ); // restore color to old object
-        focus = intersects[ 0 ].object; // Set focus to new object
-        focus.currentHex = focus.material.emissive.getHex(); // remember focused elements color
+      if ( intersects.length > 0 ) { // on focus
+        if ( focus != intersects[ 0 ].object ) { // if focus is on a new object
+          // if ( focus ) focus.material.emissive.setHex( focus.currentHex ); // restore color to old object
+          focus = intersects[ 0 ].object; // Set focus to new object
+          focus.currentHex = focus.material.emissive.getHex(); // remember focused elements color
 
-        if(gameState[focus.userData.coord].ownedBy === null) {
-          focus.material.emissive.setHex( PLAYER[playerTurn].color ); // set focused element to new color
+          if(gameState[focus.userData.coord].ownedBy === null) {
+            focus.material.emissive.setHex( PLAYER[turn].color ); // set focused element to new color
+          }
         }
-      }
-    } else {
-      if(focus) { // on blur
-        // Restore previous properties of intersection
-        focus.material.emissive.setHex( focus.currentHex );
+      } else {
+        if(focus) { // on blur
+          // Restore previous properties of intersection
+          focus.material.emissive.setHex( focus.currentHex );
 
-        focus = null;
+          focus = null;
+        }
       }
     }
   }
 
   function initMultiplayer() {
-    var socket = io(window.location.pathname, {some: 'data'});
+    socket = io(window.location.pathname, {some: 'data'});
 
     socket.on('connection', function(data) {
       // Client becomes player if one of the first two to connect to a game.
@@ -437,17 +408,17 @@
         console.log('You are player', data.playerNum + 1);
       } else {
         console.log('You are a spectator.');
+        turn = data.turn;
+        var i = 0;
+        data.moves.forEach(function(move) {
+          board.capture(move, i, true);
+          i = ~~!!!i;
+        })
       }
-
-      turn = data.turn;
-      var i = 0;
-      data.moves.forEach(function(move) {
-        board.capture(move, i, true);
-        i = ~~!!!i;
-      })
     })
 
     socket.on('user connected', function(socketId) {
+      console.log('player connected');
     })
 
     socket.on('receive move', function(data) {
@@ -463,7 +434,13 @@
     })
 
     socket.on('player leave', function(data) {
-      alert('Player ' + (data.playerNum + 1) + 'disconnected. Final score: ')
+      var numMoves = data.scores.reduce(function(a, b) { return a + b; }, -4);
+
+      if(numMoves) {
+        alert('Player ' + (data.playerNum + 1) + 'disconnected. Final score: ')
+      } else {
+        console.log('Player', (data.playerNum + 1), 'disconnected. You are now player 1');
+      }
     })
   }
 
