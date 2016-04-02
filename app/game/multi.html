@@ -14,10 +14,12 @@
   <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 
   <!-- Utils -->
-  <script defer src="../components/three.js/examples/js/effects/StereoEffect.js"></script>
-  <script defer src="../components/three.js/examples/js/controls/DeviceOrientationControls.js"></script>
-  <script defer src="../components/three.js/examples/js/controls/PointerLockControls.js"></script>
-  <script defer src="../components/three.js/examples/js/utils/GeometryUtils.js"></script>
+  <!-- TODO: lazy load these plx -->
+  <script defer src="./scripts/utils/StereoEffect.js"></script>
+  <script defer src="./scripts/utils/DeviceOrientationControls.js"></script>
+  <script defer src="./scripts/utils/PointerLockControls.js"></script>
+  <script defer src="./scripts/utils/TapTouchControls.js"></script>
+  <script defer src="./scripts/utils/GeometryUtils.js"></script>
 
   <!-- Game scripts -->
   <script defer src="./scripts/enableControls.js"></script>

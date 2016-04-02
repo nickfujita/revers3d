@@ -36,6 +36,9 @@
   mono.setSize( window.innerWidth, window.innerHeight );
   document.body.appendChild( mono.domElement );
 
+  var stereo = new THREE.StereoEffect(mono);
+
+
   // window.addEventListener('deviceorientation', setOrientationControls, true);
 
 
@@ -63,44 +66,35 @@
     controls = new THREE.PointerLockControls( camera );
 
     window.addEventListener( 'resize', onWindowResize, false );
-    document.addEventListener( 'click', onClick, false );
+    // document.addEventListener( 'click', onClick, false );
+    document.addEventListener( 'click', togVr, false );
     document.addEventListener( 'keydown', onKeyDown, false );
     document.addEventListener( 'keyup', onKeyUp, false );
 
     allowPointerLock(controls);
   }
 
-  controls.getObject().position.y = 0;
   scene.add( controls.getObject() );
-
+  var isVr = false;
   render = mono.render.bind( mono, scene, camera );
   update = camera.updateProjectionMatrix.bind( camera );
 
-  // if(isMobile()) {
-  //   var vrButton = document.getElementById('vr-icon');
-  //   var screenButton = document.getElementById('screen-icon');
-  //   vrButton.style.display = "block";
-  //   vrButton.addEventListener( 'click', toggleFullScreen.bind(null, enterVR, exitVR), false );
-  //   screenButton.addEventListener( 'click', toggleFullScreen.bind(null, enterVR, exitVR), false );
+  function togVr(event) {
+    if(event) {
+      event.stopPropagation();
+    }
 
-  //   window.controls = new THREE.DeviceOrientationControls(camera, true);
+    if(isVr) {
+      mono.setSize( window.innerWidth, window.innerHeight );
+      render = mono.render.bind( mono, scene, camera );
+      console.log('vr off');
+    } else {
+      render = stereo.render.bind( stereo, scene, camera );
+      console.log('vr on');
+    }
 
-  //   var stereo = new THREE.StereoEffect(mono);
-
-  //   instructions.style.display = 'none';
-  //   blocker.style.display = 'none';
-
-  //   render = stereo.render.bind( stereo, scene, camera );
-  //   update = controls.update.bind( controls );
-  // } else {
-  //   enablePointerLock();
-  //   window.controls = new THREE.PointerLockControls( camera );
-  //   controls.getObject().position.y = 0;
-  //   scene.add( controls.getObject() );
-
-  //   render = mono.render.bind( mono, scene, camera );
-  //   update = camera.updateProjectionMatrix.bind( camera );
-  // }
+    isVr = !isVr;
+  }
 
   /*
   ========================================
@@ -197,6 +191,7 @@
     camera.updateProjectionMatrix();
 
     mono.setSize( window.innerWidth, window.innerHeight );
+    stereo.setSize( window.innerWidth, window.innerHeight );
   }
 
   function onClick( event ) {
