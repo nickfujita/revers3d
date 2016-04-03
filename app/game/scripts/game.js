@@ -130,7 +130,7 @@
   fps.domElement.style.top = '0px';
 
   document.body.appendChild( fps.domElement );
-  // fps.domElement.style.display = 'none';
+  fps.domElement.style.display = 'none';
 
   var prevTime = performance.now();
 

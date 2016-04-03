@@ -10,8 +10,8 @@
   <!-- dependencies -->
   <script src="../components/three.js/build/three.min.js"></script>
   <script src="../components/stats.js/build/stats.min.js"></script>
-  <!-- <script src="../components/socket.io-client/socket.io.js"></script> -->
-  <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+  <script src="../components/socket.io-client/socket.io.js"></script>
+  <!-- <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script> -->
 
   <!-- Utils -->
   <!-- TODO: lazy load these plx -->
@@ -30,15 +30,23 @@
 </head>
 <body>
   <div id="blocker">
-      <div id="instructions">
-        <span style="font-size:40px">Click to play</span>
-        <br />
-        (Use the MOUSE to look around, and CLICK to select the tile)
-      </div>
+    <div id="instructions">
+      <span style="font-size:40px">Click to play</span>
+      <br />
+      (Use the MOUSE to look around, and CLICK to select the tile)
     </div>
-    <img src="../resources/fs-icon.png" alt="toggle fullscreen" id="fs-icon"/>
+  </div>
 
-    <span id="xhair">o</span>
-  </body>
+  <img src="../resources/fs-icon.png" alt="toggle fullscreen" id="fs-icon"/>
+
+  <span id="xhair">o</span>
+
+  <div id="scoreboard">
+    Score:
+    <span id="score1">25</span>
+    <span id="score2">35</span>
+  </div>
+
+  <div id="notification">Your turn!</div>
 </body>
 </html>
