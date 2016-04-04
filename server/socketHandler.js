@@ -26,7 +26,7 @@ function registerListeners(socket) {
       On connections
   ========================================
    */
-  var startData = {moves: game.moves, turn: game.activePlayer};
+  var startData = {moves: game.moves, turn: game.activePlayer, score: game.scores};
 
   if(game.players.length < 2) {
     startData.playerNum = socket.playerNum = game.players.length;
@@ -67,23 +67,31 @@ function registerListeners(socket) {
       game.activePlayer = ~~!!!game.activePlayer;
       game.scores[game.activePlayer] -= (dScore - 1);
 
-      if(game.scores.length === 52) {
-        var message = '';
+      // console.log('game.moves:', game.moves);
+
+      if(game.moves.length === 52) {
+        var message = 'Game Over! ';
         var scores = game.scores;
 
         // Arrange scores and generate game over message.
         if(socket.hasOwnProperty('playerNum')) {
-          scores = [game.scores[socket.playerNum], game.scores[!socket.playerNum]];
-          if(game.scores[socket.playerNum] > game.scores[!socket.playerNum]) {
-            message += 'Congratulations, you win!';
+          // Game over message for players
+          scores = [game.scores[socket.playerNum], game.scores[1 - socket.playerNum]];
+          if(scores[0] === scores[1]) {
+            message += 'Tie!'
           } else {
-            message += 'You lose :(';
+            message += scores[0] > scores[1] ? 'Congratulations, you win!' : 'You lose :(';
           }
         } else {
-          message += 'Game Over! Player ' + (scores[0] > scores[1] ? 1 : 2) + ' wins!';
+          // Game over message for spectators
+          if(scores[0] === scores[1]) {
+            message += 'It\'s a tie!';
+          } else {
+            message += 'Player ' + (scores[0] > scores[1] ? 1 : 2) + ' wins!';
+          }
         }
 
-        socket.emit('game over', {message: message, scores: scores});
+        game.emit('game over', {message: message, scores: scores});
       } else {
         game.emit('receive move', {move: move, turn: turn, scores: game.scores});
       }
@@ -104,7 +112,7 @@ function registerListeners(socket) {
 
 
       // If there are no players left, remove the game from the collection.
-      if(!game.players.length && game.moves.length) {
+      if(!game.players.length) {
         gameDb.remove({roomId: game.id}, function(err) {
           if(err) console.error('DB error deleting game', err);
         });
