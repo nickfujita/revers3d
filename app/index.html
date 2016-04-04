@@ -6,77 +6,94 @@
   <title>Revers3D</title>
   <link rel="stylesheet" href="./css/normalize.min.css">
   <link rel="stylesheet" href="./css/home.css">
+  <link rel="shortcut icon" type="image/x-icon" href="./resources/favicon.ico">
+
+  <link href='https://fonts.googleapis.com/css?family=Oswald:300|Raleway:300' rel='stylesheet' type='text/css'>
 </head>
 <body>
-  <nav>
-    <h1>Revers3d</h1>
-    <span>this is totally the finished game.</span>
-  </nav>
-
-  <header><h1>Play!</h1></header>
+  <div id="hook">
+    <h1 id="intro">Welcome to <span class="accent">Revers3D</span></h1>
+    <h3 id="tagline">Best game on the internet :O</h3>
+    <span>Select an option below to play</span>
+  </div>
   <section id="play">
     <a href="/create" class="button">
-      <div class="button-container">
+      <div id="play-private" class="button-container">
         <h1>
           Create
         </h1>
-        <span>private game</span>
+        <div class="accent">private game</div>
       </div>
     </a>
 
     <a href="/play" class="button">
-      <div class="button-container">
+      <div id="play-online" class="button-container">
         <h1>
           Online
         </h1>
-        <span>multiplayer</span>
+        <div class="accent">multiplayer</div>
       </div>
     </a>
 
     <a href="/game/single" class="button">
-      <div class="button-container">
+      <div id="play-local" class="button-container">
         <h1>
           Local
         </h1>
-        <span>multiplayer</span>
+        <div class="accent">multiplayer</div>
       </div>
     </a>
 
     <a href="/watch" class="button">
-      <div class="button-container">
+      <div id="play-watch" class="button-container">
         <h1>
           Watch
         </h1>
-        <span>random live game</span>
+        <div class="accent">random live game</div>
       </div>
     </a>
   </section>
 
-  <header><h1>How to play:</h1></header>
+  <header><h1>How to play</h1></header>
   <section id="how">
     <div class="how-container" id="how1">
-      <img src="" alt="" class="how_img" width="200px" height="200px">
-      <br><strong>Step 1:</strong><div class="how-text">Join a game.</div>
+      <img src="./resources/step1.jpg" alt="" class="how-img">
+      <div class="how-text"><strong>Step 1:</strong><br>Join a game.</div>
     </div>
     <div class="how-container" id="how2">
-      <img src="" alt="" class="how_img" width="200px" height="200px">
-      <br><strong>Step 2:</strong><div class="how-text">Surround the enemy tiles.</div>
+      <img src="./resources/step2.jpg" alt="" class="how-img">
+      <div class="how-text"><strong>Step 2:</strong><br>Surround the enemy tiles.</div>
     </div>
     <div class="how-container" id="how3">
-      <img src="" alt="" class="how_img" width="200px" height="200px">
-      <br><strong>Step 3:</strong><div class="how-text">???????</div>
+      <img src="./resources/step3.jpg" alt="" class="how-img">
+      <div class="how-text"><strong>Step 3:</strong><br>???????</div>
     </div>
     <div class="how-container" id="how4">
-      <img src="" alt="" class="how_img" width="200px" height="200px">
-      <br><strong>Step 4:</strong><div class="how-text">Profit!</div>
+      <img src="./resources/step4.jpg" alt="" class="how-img">
+      <div class="how-text"><strong>Step 4:</strong><br>Profit!</div>
     </div>
   </section>
 
   <header><h1>About</h1></header>
   <section id="about">
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Molestiae saepe fugit eaque, voluptates praesentium non placeat. Nobis numquam asperiores officia aliquid perferendis blanditiis. Officia quibusdam, ad, porro dicta iste exercitationem!</p>
-    <p>Quam fugiat, perspiciatis veritatis nisi iure cum ad quia atque nostrum voluptatum. In enim, accusantium amet animi assumenda deserunt quod culpa nostrum, quaerat expedita illum tenetur, reiciendis repellendus ipsam libero.</p>
-    <p>Quia beatae dolorum officiis, ut accusantium nobis ducimus in quidem accusamus distinctio aspernatur quasi delectus tenetur magnam quas vitae et, cumque assumenda eveniet voluptas provident deserunt debitis explicabo. Animi, suscipit?</p>
+    <p>Revers3D is a modern take on the classic board game, Reversi. With the board wrapped into a 3D environment, the strategy and gameplay has been taken into a whole new dimension (oh ho!).</p>
+
+    <p>For those who are unfamiliar with the gameplay, the goal is to have the most tiles by the end of the game. This is accomplished by surrounding your opponents tiles on either side of their chain from any angle. All angles are fair game, so keep an eye out for horizontal, vertical, positive, and negative opportunities!</p>
+
+    <p>Those of you who have played Reversi (or Othello) will learn that your old strategies won't work here. Edes and corners aren't what they used to be, so you'll need to find a new way to play the game. Challenge your mind, and your friends, and get <span class="accent">Revers3D!</span></p>
+  </section>
+
+  <header><h1>If you like the game...</h1></header>
+  <section id="develop">
+    <p>Revers3D is built on some fun technologies:</p>
+    <ul>
+      <li>three.js w/ WebGL</li>
+      <li>node.js w/ Express</li>
+      <li>socket.io</li>
+      <li>mongoDB</li>
+    </ul>
+
+    <p>And it's still a work in progress. There is still so much I want to do! For example, I'd like to add 3d sounds and music, more interesting tiles and backgrounds, add selectable player colors, and allow players to track their performance, just to name a few. If you are interested in helping out, have some ideas to share, or just want to tell me how much you like the game, feel free to <a class="accent" href="mailto:revers3d.game@gmail.com?subject=Comment%20on%20revers3D">Email Us</a>!</p>
   </section>
 </body>
 </html>

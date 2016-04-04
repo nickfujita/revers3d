@@ -2,28 +2,115 @@
   /*outline: 1px red dashed;*/
 }
 
-@media (max-width: 800px) {
-  section {
-    flex-direction: column;
-  }
-}
-
 body {
-  /*background-color: firebrick;*/
+  background-image: url('../resources/bg5.jpg');
+  background-attachment : fixed;
+  background-size       : cover;
+  color: white;
+  font-family: 'Raleway', sans-serif;
+  font-weight: lighter;
+  padding: 0 2vw;
 }
 
 section {
   display: flex;
   align-items: flex-start;
+  background-color: dimgrey;
+  padding: 10px 0 20px 0;
 }
-
 
 h1 {
   margin: 0;
 }
 
 header {
+  font-family: 'Oswald', sans-serif;
   text-align: center;
+  color: chartreuse;
+  background-color: dimgrey;
+}
+
+nav {
+  background-color: dimgrey;
+}
+
+.accent {
+  color: chartreuse;
+  font-family: 'Raleway', sans-serif;
+}
+
+#hook {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: block;
+  margin: 10vw auto;
+  width: 40vw;
+  background-color: dimgrey;
+  color: white;
+  border: 5px solid #000;
+  border-radius: 5px;
+  text-align: center;
+  padding: 15px;
+  font-family: 'Raleway', sans-serif;
+}
+
+#play {
+  font-family: 'Oswald', sans-serif;
+  background-color: transparent;
+  margin-bottom: 70px;
+}
+
+#play-private:hover::after {
+  position: absolute;
+  width: 18vw;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  -o-transform: translateX(-50%);
+  transform: translateX(-50%);
+  margin-top: 5px;
+  background-color: white;
+  border-radius: 5px;
+  content: "Create a game that isn't entered into the public queue and share the url with a friend.";
+}
+
+#play-online:hover::after {
+  position: absolute;
+  width: 18vw;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  -o-transform: translateX(-50%);
+  transform: translateX(-50%);
+  margin-top: 5px;
+  background-color: white;
+  border-radius: 5px;
+  content: "Enter the public queue to play against a stranger.";
+}
+
+#play-local:hover::after {
+  position: absolute;
+  width: 18vw;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  -o-transform: translateX(-50%);
+  transform: translateX(-50%);
+  margin-top: 5px;
+  background-color: white;
+  border-radius: 5px;
+  content: "Create a local game to play on the same machine.";
+}
+
+#play-watch:hover::after {
+  position: absolute;
+  width: 18vw;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  -o-transform: translateX(-50%);
+  transform: translateX(-50%);
+  margin-top: 5px;
+  background-color: white;
+  border-radius: 5px;
+  content: "Watch a game that's currently being played.";
 }
 
 .button-container {
@@ -31,21 +118,19 @@ header {
 }
 
 .button {
-  flex: 1;
-  width: 100px;
-  height: 64px;
-  margin: auto 20px;
+  width: 20vw;
+  margin: auto 3vw;
   text-align: center;
   color: black;
-  background-image: -webkit-linear-gradient(bottom, papayawhip, white);
-  background-image: -o-linear-gradient(bottom, papayawhip, white);
-  background-image: linear-gradient(to top, papayawhip, white);
+  background-image: -webkit-linear-gradient(bottom, dimgrey, white);
+  background-image: -o-linear-gradient(bottom, dimgrey, white);
+  background-image: linear-gradient(to top, dimgrey, white);
   border-radius: 5px;
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
   -webkit-transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
   transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
   text-decoration: none;
+  padding: 2px;
 }
 
 .button:active {
@@ -55,7 +140,7 @@ header {
 }
 
 .button:visited {
-  color: inherit;
+  color: black;
 }
 
 .button::after {
@@ -80,31 +165,102 @@ header {
   opacity: 1;
 }
 
-#play {
-  height: 300px;
-}
-
-#how {
-  height: 400px;
-  /*text-align: justify;*/
-}
-
 .how-container {
-  /*flex: 1;*/
   display: inline-block;
   margin: auto auto;
   text-align: center;
+  border: 5px solid #000;
+  border-radius: 5px;
+}
 
+.how-img {
+  display: block;
+  width: 20vw;
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.3);
 }
 
 .how-text {
-  margin: 0;
+  padding: 5px 0;
+  background-color: white;
+  color: black;
 }
 
 #about {
-  flex-direction: column;
+  display: inline-block;
+  padding: 0 2vw;
 }
 
-#about > p {
-  margin: 20px;
+#develop {
+  display: inline-block;
+  padding: 0 2vw;
+}
+
+ul {
+  margin: auto 2vw;
+}
+
+
+/*
+========================================
+    Media Queries
+========================================
+ */
+
+@media (max-width: 1200px) {
+  body {
+    font-size: 40px;
+  }
+
+  #hook {
+    margin: 10px auto;
+    width: 75vw;
+  }
+
+  .button {
+  }
+
+  #play {
+    flex-direction: column;
+    height: auto;
+  }
+
+  #play-private:hover::after {display: none;}
+  #play-online:hover::after {display: none;}
+  #play-local:hover::after {display: none;}
+  #play-watch:hover::after {display: none;}
+
+  .button {
+    display: block;
+    margin: 10px auto;
+    width: 50vw;
+  }
+
+  #how {
+    flex-wrap: wrap;
+  }
+
+  .how-container {
+    padding: 5vw;
+  }
+
+  .how-img {
+    width: 30vw;
+  }
+}
+
+@media (max-width: 450px) {
+  #hook {
+    margin: 10px;
+    width: 90vw;
+  }
+
+  .button {
+    display: block;
+    margin: 10px auto;
+    width: 80vw;
+  }
+
+  .how-img {
+    width: 90vw;
+  }
 }

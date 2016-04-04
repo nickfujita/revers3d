@@ -155,7 +155,7 @@
       if ( moveLeft ) velocity.x -= 400.0 * delta;
       if ( moveRight ) velocity.x += 400.0 * delta;
       if ( moveUp ) velocity.y += 400.0 * delta;
-      if ( moveDown ) velocity.y -= 400.0 * delta;
+      // if ( moveDown ) velocity.y -= 400.0 * delta;
 
       controls.getObject().translateX( velocity.x * delta );
       controls.getObject().translateY( velocity.y * delta );
@@ -204,9 +204,21 @@
           turn = ~~!!!turn;
           scores[turn] -= (dScore - 1);
 
-          score1.innerText = scores[0].length === 2 ? scores[0] : ('0' + scores[0]);
-          score2.innerText = scores[1].length === 2 ? scores[1] : ('0' + scores[1]);
+          score1.innerText = scores[0].toString().length === 2 ? scores[0] : ('0' + scores[0]);
+          score2.innerText = scores[1].toString().length === 2 ? scores[1] : ('0' + scores[1]);
           notifyArea.innerText = 'Player ' + (turn + 1) + '\'s turn';
+
+          if(scores[0] + scores[1] === 56) {
+            var message = 'Game over. ';
+
+            if(scores[0] === scores[1]) {
+              message += 'It\'s a Tie! '
+            } else {
+              message += 'Player ' + (scores[0] > scores[1] ? 1 : 2) + ' wins!';
+              // message += scores[0] > scores[1] ? 'Congratulations, you win!' : 'You lose :(';
+            }
+            notifyArea.innerText = message;
+          }
         }
       } else {
         console.log(focus.userData.coord, 'owned by player', gameState[coord].ownedBy);
@@ -439,8 +451,8 @@
       board.capture(data.move, data.turn);
       turn = ~~!!!data.turn;
       scores = data.scores;
-      score1.innerText = scores[0].length === 2 ? scores[0] : ('0' + scores[0]);
-      score2.innerText = scores[1].length === 2 ? scores[1] : ('0' + scores[1]);
+      score1.innerText = scores[0].toString().length === 2 ? scores[0] : ('0' + scores[0]);
+      score2.innerText = scores[1].toString().length === 2 ? scores[1] : ('0' + scores[1]);
       notifyArea.innerText = window.hasOwnProperty('PLAYER_NUM') && window.PLAYER_NUM === turn ? 'Your turn' : 'Player ' + (turn + 1) + '\'s turn';
     })
 
