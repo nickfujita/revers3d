@@ -7,6 +7,8 @@
 
   var isMobile = checkMobile();
   var turn = 0;
+  var scores = [2, 2];
+
   var notifyArea = document.getElementById('notification');
   var score1 = document.getElementById('score1');
   var score2 = document.getElementById('score2');
@@ -196,8 +198,15 @@
         if(window.isMultiplayer) {
           socket.emit('send move', coord);
         } else {
-          board.capture(coord, turn);
+          var dScore = board.capture(coord, turn);
+
+          scores[turn] += dScore;
           turn = ~~!!!turn;
+          scores[turn] -= (dScore - 1);
+
+          score1.innerText = scores[0].length === 2 ? scores[0] : ('0' + scores[0]);
+          score2.innerText = scores[1].length === 2 ? scores[1] : ('0' + scores[1]);
+          notifyArea.innerText = 'Player ' + (turn + 1) + '\'s turn';
         }
       } else {
         console.log(focus.userData.coord, 'owned by player', gameState[coord].ownedBy);
@@ -429,9 +438,9 @@
     socket.on('receive move', function(data) {
       board.capture(data.move, data.turn);
       turn = ~~!!!data.turn;
-      var scores = data.scores;
-      score1.innerText = scores[0].length = 2 ? scores[0] : '0' + scores[0];
-      score2.innerText = scores[1].length = 2 ? scores[1] : '0' + scores[1];
+      scores = data.scores;
+      score1.innerText = scores[0].length === 2 ? scores[0] : ('0' + scores[0]);
+      score2.innerText = scores[1].length === 2 ? scores[1] : ('0' + scores[1]);
       notifyArea.innerText = window.hasOwnProperty('PLAYER_NUM') && window.PLAYER_NUM === turn ? 'Your turn' : 'Player ' + (turn + 1) + '\'s turn';
     })
 

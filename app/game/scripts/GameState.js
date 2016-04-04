@@ -190,6 +190,8 @@ GameState.prototype.capture = function(coord, playerTurn) {
   toCapture.forEach(function(tile) {
     tile.setOwner(playerTurn);
   })
+
+  return toCapture.length;
 }
 
 GameState.prototype.reset = function() {

@@ -204,6 +204,8 @@ Board.prototype.capture = function(coord, playerNum, noAnimate) {
   var captureMode = noAnimate ? capture : captureAnimated;
   toCapture.forEach(captureMode);
 
+  return toCapture.length;
+
   function captureAnimated(tile, i) {
     tile.setOwner(playerNum);
     tile.mesh.currentHex = capColor;
