@@ -3,12 +3,13 @@
 }
 
 body {
-  background-image: url('../resources/bg3.jpg');
+  background-image: url('../resources/bg5.jpg');
   background-attachment : fixed;
   background-size       : cover;
   color: white;
   font-family: 'Raleway', sans-serif;
   font-weight: lighter;
+  padding: 0 2vw;
 }
 
 section {
@@ -56,23 +57,59 @@ nav {
 
 #play {
   font-family: 'Oswald', sans-serif;
-  /*height: 20vh;*/
   background-color: transparent;
+  margin-bottom: 70px;
 }
 
 #play-private:hover::after {
+  position: absolute;
+  width: 18vw;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  -o-transform: translateX(-50%);
+  transform: translateX(-50%);
+  margin-top: 5px;
+  background-color: white;
+  border-radius: 5px;
   content: "Create a game that isn't entered into the public queue and share the url with a friend.";
 }
 
 #play-online:hover::after {
+  position: absolute;
+  width: 18vw;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  -o-transform: translateX(-50%);
+  transform: translateX(-50%);
+  margin-top: 5px;
+  background-color: white;
+  border-radius: 5px;
   content: "Enter the public queue to play against a stranger.";
 }
 
 #play-local:hover::after {
+  position: absolute;
+  width: 18vw;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  -o-transform: translateX(-50%);
+  transform: translateX(-50%);
+  margin-top: 5px;
+  background-color: white;
+  border-radius: 5px;
   content: "Create a local game to play on the same machine.";
 }
 
 #play-watch:hover::after {
+  position: absolute;
+  width: 18vw;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  -o-transform: translateX(-50%);
+  transform: translateX(-50%);
+  margin-top: 5px;
+  background-color: white;
+  border-radius: 5px;
   content: "Watch a game that's currently being played.";
 }
 
@@ -81,7 +118,6 @@ nav {
 }
 
 .button {
-  /*flex: 1;*/
   width: 20vw;
   margin: auto 3vw;
   text-align: center;
@@ -91,7 +127,6 @@ nav {
   background-image: linear-gradient(to top, dimgrey, white);
   border-radius: 5px;
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
   -webkit-transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
   transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
   text-decoration: none;
@@ -134,19 +169,24 @@ nav {
   display: inline-block;
   margin: auto auto;
   text-align: center;
+  border: 5px solid #000;
+  border-radius: 5px;
 }
 
 .how-img {
+  display: block;
   width: 20vw;
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.3);
 }
 
 .how-text {
-  margin: 0;
+  padding: 5px 0;
+  background-color: white;
+  color: black;
 }
 
 #about {
   display: inline-block;
-  /*background-color: darkgray;*/
   padding: 0 2vw;
 }
 
@@ -183,6 +223,11 @@ ul {
     flex-direction: column;
     height: auto;
   }
+
+  #play-private:hover::after {display: none;}
+  #play-online:hover::after {display: none;}
+  #play-local:hover::after {display: none;}
+  #play-watch:hover::after {display: none;}
 
   .button {
     display: block;
