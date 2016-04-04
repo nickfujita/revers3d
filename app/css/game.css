@@ -11,7 +11,9 @@ body {
   background-color: #ffffff;
   margin: 0;
   overflow: hidden;
-  font-family: arial;
+  /*font-family: arial;*/
+  font-family: 'Oswald', sans-serif;
+  font-family: 'Raleway', sans-serif;
 }
 
 #blocker {
@@ -63,6 +65,7 @@ body {
 }
 
 #fs-icon {
+  display:none;
   position: fixed;
   right: 0;
   bottom: 0;

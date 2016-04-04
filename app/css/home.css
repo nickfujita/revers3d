@@ -2,28 +2,78 @@
   /*outline: 1px red dashed;*/
 }
 
-@media (max-width: 800px) {
-  section {
-    flex-direction: column;
-  }
-}
-
 body {
-  /*background-color: firebrick;*/
+  background-image: url('../resources/bg3.jpg');
+  background-attachment : fixed;
+  background-size       : cover;
+  color: white;
+  font-family: 'Raleway', sans-serif;
+  font-weight: lighter;
 }
 
 section {
   display: flex;
   align-items: flex-start;
+  background-color: dimgrey;
+  padding: 10px 0 20px 0;
 }
-
 
 h1 {
   margin: 0;
 }
 
 header {
+  font-family: 'Oswald', sans-serif;
   text-align: center;
+  color: chartreuse;
+  background-color: dimgrey;
+}
+
+nav {
+  background-color: dimgrey;
+}
+
+.accent {
+  color: chartreuse;
+  font-family: 'Raleway', sans-serif;
+}
+
+#hook {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: block;
+  margin: 10vw auto;
+  width: 40vw;
+  background-color: dimgrey;
+  color: white;
+  border: 5px solid #000;
+  border-radius: 5px;
+  text-align: center;
+  padding: 15px;
+  font-family: 'Raleway', sans-serif;
+}
+
+#play {
+  font-family: 'Oswald', sans-serif;
+  height: 20vh;
+  background-color: transparent;
+}
+
+#play-private:hover::after {
+  content: "Create a game that isn't entered into the public queue and share the url with a friend.";
+}
+
+#play-online:hover::after {
+  content: "Enter the public queue to play against a stranger.";
+}
+
+#play-local:hover::after {
+  content: "Create a local game to play on the same machine.";
+}
+
+#play-watch:hover::after {
+  content: "Watch a game that's currently being played.";
 }
 
 .button-container {
@@ -31,21 +81,21 @@ header {
 }
 
 .button {
-  flex: 1;
-  width: 100px;
-  height: 64px;
-  margin: auto 20px;
+  /*flex: 1;*/
+  width: 20vw;
+  margin: auto 3vw;
   text-align: center;
   color: black;
-  background-image: -webkit-linear-gradient(bottom, papayawhip, white);
-  background-image: -o-linear-gradient(bottom, papayawhip, white);
-  background-image: linear-gradient(to top, papayawhip, white);
+  background-image: -webkit-linear-gradient(bottom, dimgrey, white);
+  background-image: -o-linear-gradient(bottom, dimgrey, white);
+  background-image: linear-gradient(to top, dimgrey, white);
   border-radius: 5px;
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
   border-radius: 5px;
   -webkit-transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
   transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
   text-decoration: none;
+  padding: 2px;
 }
 
 .button:active {
@@ -55,7 +105,7 @@ header {
 }
 
 .button:visited {
-  color: inherit;
+  color: black;
 }
 
 .button::after {
@@ -80,21 +130,14 @@ header {
   opacity: 1;
 }
 
-#play {
-  height: 300px;
-}
-
-#how {
-  height: 400px;
-  /*text-align: justify;*/
-}
-
 .how-container {
-  /*flex: 1;*/
   display: inline-block;
   margin: auto auto;
   text-align: center;
+}
 
+.how-img {
+  width: 20vw;
 }
 
 .how-text {
@@ -102,9 +145,61 @@ header {
 }
 
 #about {
-  flex-direction: column;
+  display: inline-block;
+  /*background-color: darkgray;*/
+  padding: 0 2vw;
 }
 
-#about > p {
-  margin: 20px;
+
+/*
+========================================
+    Media Queries
+========================================
+ */
+
+@media (max-width: 800px) {
+  #hook {
+    margin: 10px auto;
+    width: 75vw;
+  }
+
+  #play {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .button {
+    display: block;
+    margin: 10px auto;
+    width: 50vw;
+  }
+
+  #how {
+    flex-wrap: wrap;
+  }
+
+  .how-container {
+    padding: 5vw;
+  }
+
+  .how-img {
+    width: 30vw;
+  }
+}
+
+@media (max-width: 400px) {
+  #hook {
+    margin: 10px;
+    width: 90vw;
+  }
+
+  .button {
+    display: block;
+    margin: 10px auto;
+    width: 80vw;
+  }
+
+  .how-img {
+    width: 90vw;
+  }
 }
