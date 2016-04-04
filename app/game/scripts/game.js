@@ -7,6 +7,11 @@
 
   var isMobile = checkMobile();
   var turn = 0;
+  var scores = [2, 2];
+
+  var notifyArea = document.getElementById('notification');
+  var score1 = document.getElementById('score1');
+  var score2 = document.getElementById('score2');
   var PLAYER = [
     {
       color: 0xff0000
@@ -37,7 +42,6 @@
   document.body.appendChild( mono.domElement );
 
   var stereo = new THREE.StereoEffect(mono);
-
 
   /*
   ========================================
@@ -130,7 +134,7 @@
   fps.domElement.style.top = '0px';
 
   document.body.appendChild( fps.domElement );
-  // fps.domElement.style.display = 'none';
+  fps.domElement.style.display = 'none';
 
   var prevTime = performance.now();
 
@@ -191,7 +195,19 @@
       var coord = focus.userData.coord;
 
       if(gameState[coord].ownedBy === null) {
-        socket.emit('send move', coord)
+        if(window.isMultiplayer) {
+          socket.emit('send move', coord);
+        } else {
+          var dScore = board.capture(coord, turn);
+
+          scores[turn] += dScore;
+          turn = ~~!!!turn;
+          scores[turn] -= (dScore - 1);
+
+          score1.innerText = scores[0].length === 2 ? scores[0] : ('0' + scores[0]);
+          score2.innerText = scores[1].length === 2 ? scores[1] : ('0' + scores[1]);
+          notifyArea.innerText = 'Player ' + (turn + 1) + '\'s turn';
+        }
       } else {
         console.log(focus.userData.coord, 'owned by player', gameState[coord].ownedBy);
       }
@@ -365,7 +381,7 @@
   }
 
   function findIntersects() {
-    if(window.PLAYER_NUM === turn) {
+    if(!window.isMultiplayer || window.PLAYER_NUM === turn) {
       sightline.setFromCamera( mouse, camera );
 
       // calculate board tiles intersecting the picking ray
@@ -399,37 +415,39 @@
       // Client becomes player if one of the first two to connect to a game.
       // Otherwise, is spectator.
       if(data.hasOwnProperty('playerNum')) {
-        Object.defineProperty(window, 'PLAYER_NUM', {
-          value: data.playerNum,
-          writeable: false,
-          enumerable: false
-        })
+        window.PLAYER_NUM = data.playerNum;
 
-        console.log('You are player', data.playerNum + 1);
+        notifyArea.innerText = 'You are player ' + (data.playerNum + 1) + '!';
       } else {
-        console.log('You are a spectator.');
+        notifyArea.innerText = 'You are spectating';
+        score1.innerText = scores[0].length = 2 ? scores[0] : '0' + scores[0];
+        score2.innerText = scores[1].length = 2 ? scores[1] : '0' + scores[1];
         turn = data.turn;
         var i = 0;
         data.moves.forEach(function(move) {
           board.capture(move, i, true);
           i = ~~!!!i;
-        })
+        });
       }
     })
 
     socket.on('user connected', function(socketId) {
-      console.log('player connected');
+      // notifyArea.innerText = 'player connected';
     })
 
     socket.on('receive move', function(data) {
       board.capture(data.move, data.turn);
       turn = ~~!!!data.turn;
-      var scores = data.scores;
-      console.log('scores', scores);
+      scores = data.scores;
+      score1.innerText = scores[0].length === 2 ? scores[0] : ('0' + scores[0]);
+      score2.innerText = scores[1].length === 2 ? scores[1] : ('0' + scores[1]);
+      notifyArea.innerText = window.hasOwnProperty('PLAYER_NUM') && window.PLAYER_NUM === turn ? 'Your turn' : 'Player ' + (turn + 1) + '\'s turn';
     })
 
     socket.on('game over', function(data) {
-      alert(data.message + ' Final score: ' + data.scores[0] + ' : ' + data.scores[1]);
+      console.log('game over');
+
+      notifyArea.innerText = data.message + ' Final score: ' + data.scores[0] + ' : ' + data.scores[1];
       // do game over stuff and show rematch/find new games buttons
     })
 
@@ -437,12 +455,13 @@
       var numMoves = data.scores.reduce(function(a, b) { return a + b; }, -4);
 
       if(numMoves) {
-        alert('Player ' + (data.playerNum + 1) + 'disconnected. Final score: ')
+        notifyArea.innerText = 'Player ' + (data.playerNum + 1) + 'disconnected. Final score: ' + data.scores[0] + ' : ' + data.scores[1];
       } else {
-        console.log('Player', (data.playerNum + 1), 'disconnected. You are now player 1');
+        window.PLAYER_NUM = 0
+
+        notifyArea.innerText = 'Player ' + (data.playerNum + 1) + ' disconnected. You are now player 1.';
       }
     })
   }
 
 })();
-
