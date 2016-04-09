@@ -62,18 +62,22 @@
   // screenButton.addEventListener( 'touchstart', toggleFSVR, false );
 
   if(isMobile) {
+    // controls = new THREE.TapTouchControls( camera );
     controls = new THREE.DeviceOrientationControls( camera );
 
-    // var PI_2 = Math.PI / 2;
-    // var xStart, yStart;
-    // var tapStart;
-    // var yaw = controls.yawObject;
-    // var pitch = controls.pitchObject;
+    var PI_2 = Math.PI / 2;
+    var xStart, yStart;
+    var tapStart;
+    var yaw = controls.yawObject;
+    var pitch = controls.pitchObject;
 
     document.addEventListener( 'touchstart', onTouchStart, false );
     // document.addEventListener( 'touchmove', onTouchMove, false );
     document.addEventListener( 'touchend', onTouchEnd, false );
 
+    // render = mono.render.bind( mono, scene, camera );
+    // update = camera.updateProjectionMatrix.bind( camera );
+    // scene.add( controls.getObject() );
     render = stereo.render.bind( stereo, scene, camera );
     update = controls.update.bind( controls );
   } else {

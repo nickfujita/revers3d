@@ -232,7 +232,7 @@ ul {
   .button {
     display: block;
     margin: 10px auto;
-    width: 50vw;
+    width: 75vw;
   }
 
   #how {
@@ -240,11 +240,11 @@ ul {
   }
 
   .how-container {
-    padding: 5vw;
+    margin: 10px auto;
   }
 
   .how-img {
-    width: 30vw;
+    width: 75vw;
   }
 }
 

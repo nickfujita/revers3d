@@ -53,6 +53,7 @@ body {
 }
 
 #xhair {
+  display:none;
   position: fixed;
   top: 50%;
   left: 50%;
@@ -65,7 +66,6 @@ body {
 }
 
 #fs-icon {
-  display:none;
   position: fixed;
   right: 0;
   bottom: 0;
