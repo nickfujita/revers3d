@@ -181,6 +181,7 @@ nav {
 
 .how-text {
   padding: 5px 0;
+  word-wrap: normal;
   background-color: white;
   color: black;
 }
@@ -241,6 +242,7 @@ ul {
 
   .how-container {
     margin: 10px auto;
+    max-width: 75vw;
   }
 
   .how-img {
@@ -258,6 +260,10 @@ ul {
     display: block;
     margin: 10px auto;
     width: 80vw;
+  }
+
+  .how-container {
+    max-width: 90vw;
   }
 
   .how-img {
