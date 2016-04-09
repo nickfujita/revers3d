@@ -159,7 +159,7 @@
       if ( moveLeft ) velocity.x -= 400.0 * delta;
       if ( moveRight ) velocity.x += 400.0 * delta;
       if ( moveUp ) velocity.y += 400.0 * delta;
-      // if ( moveDown ) velocity.y -= 400.0 * delta;
+      if ( moveDown ) velocity.y -= 400.0 * delta;
 
       controls.getObject().translateX( velocity.x * delta );
       controls.getObject().translateY( velocity.y * delta );
@@ -405,7 +405,7 @@
 
       if ( intersects.length > 0 ) { // on focus
         if ( focus != intersects[ 0 ].object ) { // if focus is on a new object
-          // if ( focus ) focus.material.emissive.setHex( focus.currentHex ); // restore color to old object
+          if ( focus ) focus.material.emissive.setHex( focus.currentHex ); // restore old focus' color
           focus = intersects[ 0 ].object; // Set focus to new object
           focus.currentHex = focus.material.emissive.getHex(); // remember focused elements color
 
@@ -415,8 +415,7 @@
         }
       } else {
         if(focus) { // on blur
-          // Restore previous properties of intersection
-          focus.material.emissive.setHex( focus.currentHex );
+          focus.material.emissive.setHex( focus.currentHex ); // restore old focus' color
 
           focus = null;
         }
