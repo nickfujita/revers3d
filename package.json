@@ -4,7 +4,7 @@
   "description": "Play othello/reversi. With a friend. In 3d. In VR.",
   "main": "server.js",
   "scripts": {
-    "postinstall": "bower install & grunt build",
+    "postinstall": "bower install",
     "start": "node server"
   },
   "author": "",
