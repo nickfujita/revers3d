@@ -65,14 +65,10 @@
     // controls = new THREE.TapTouchControls( camera );
     controls = new THREE.DeviceOrientationControls( camera );
 
-    var PI_2 = Math.PI / 2;
     var xStart, yStart;
     var tapStart;
-    var yaw = controls.yawObject;
-    var pitch = controls.pitchObject;
 
     document.addEventListener( 'touchstart', onTouchStart, false );
-    // document.addEventListener( 'touchmove', onTouchMove, false );
     document.addEventListener( 'touchend', onTouchEnd, false );
 
     // render = mono.render.bind( mono, scene, camera );
@@ -129,22 +125,22 @@
   window.requestAnimationFrame( animate );
 
   // FPS
-  var fps = new Stats();
-  fps.setMode( 0 ); // 0: fps, 1: ms, 2: mb
+  // var fps = new Stats();
+  // fps.setMode( 0 ); // 0: fps, 1: ms, 2: mb
 
   // align top-left
-  fps.domElement.style.position = 'absolute';
-  fps.domElement.style.left = '0px';
-  fps.domElement.style.top = '0px';
-
-  document.body.appendChild( fps.domElement );
-  fps.domElement.style.display = 'none';
+  // fps.domElement.style.position = 'absolute';
+  // fps.domElement.style.left = '0px';
+  // fps.domElement.style.top = '0px';
+//
+  // document.body.appendChild( fps.domElement );
+  // fps.domElement.style.display = 'none';
 
   var prevTime = performance.now();
 
   function animate(time) {
     // Begin FPS calculation
-    fps.begin();
+    // fps.begin();
 
     // Allow movement for development
     if ( !isMobile ) {
@@ -173,7 +169,7 @@
     render();
 
     // End FPS calculation
-    fps.end();
+    // fps.end();
 
     window.requestAnimationFrame( animate );
   }
@@ -248,12 +244,13 @@
 
       var dx = xEnd - xStart;
       var dy = yEnd - yStart;
+      var PI_2 = Math.PI / 2;
 
-      yaw.rotation.y += 0.005 * dx;
+      controls.yawObject.rotation.y += 0.005 * dx;
       xStart += dx;
 
-      pitch.rotation.x += 0.005 * dy;
-      pitch.rotation.x = Math.max( - PI_2, Math.min( PI_2, pitch.rotation.x ) );
+      controls.pitchObject.rotation.x += 0.005 * dy;
+      controls.pitchObject.rotation.x = Math.max( - PI_2, Math.min( PI_2, controls.pitchObject.rotation.x ) );
       yStart += dy;
     }
   };
@@ -333,15 +330,15 @@
         moveDown = false;
         break;
 
-      case 70: // f
-        if(event.ctrlKey) {
-          if(fps.domElement.style.display === 'none') {
-            fps.domElement.style.display = 'block';
-          } else {
-            fps.domElement.style.display = 'none';
-          }
-        }
-        break;
+      // case 70: // f
+      //   if(event.ctrlKey) {
+      //     if(fps.domElement.style.display === 'none') {
+      //       fps.domElement.style.display = 'block';
+      //     } else {
+      //       fps.domElement.style.display = 'none';
+      //     }
+      //   }
+      //   break;
     }
   };
 
@@ -381,19 +378,39 @@
     return document.fullscreenEnabled || document.mozFullscreenEnabled || document.webkitIsFullScreen ? false : true;
   }
 
+  window.enterVR = enterVR;
   function enterVR() {
-    vrButton.style.display = "none";
-    screenButton.style.display = "block";
+    // vrButton.style.display = "none";
+    // screenButton.style.display = "block";
 
+    document.removeEventListener( 'touchmove', onTouchMove, false );
+    scene.remove( controls.getObject() );
+
+    // controls = new THREE.DeviceOrientationControls( camera );
+    // render = stereo.render.bind( stereo, scene, camera );
+    // update = controls.update.bind( controls );
+
+    controls = new THREE.DeviceOrientationControls( camera );
+    // controls.enabled = true;
     render = stereo.render.bind( stereo, scene, camera );
+    update = controls.update.bind( controls );
   }
 
+  window.exitVR = exitVR;
   function exitVR() {
-    vrButton.style.display = "block";
-    screenButton.style.display = "none";
+    // vrButton.style.display = "block";
+    // screenButton.style.display = "none";
+
+    controls = new THREE.TapTouchControls( camera );
+
+    document.addEventListener( 'touchmove', onTouchMove, false );
+
+    // camera.updateProjectionMatrix();
 
     mono.setSize( window.innerWidth, window.innerHeight );
     render = mono.render.bind( mono, scene, camera );
+    update = camera.updateProjectionMatrix.bind( camera );
+    scene.add( controls.getObject() );
   }
 
   function findIntersects() {

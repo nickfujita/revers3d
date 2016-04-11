@@ -8,24 +8,32 @@
   <link href='https://fonts.googleapis.com/css?family=Oswald:300|Raleway:300' rel='stylesheet' type='text/css'>
   <link rel="shortcut icon" type="image/x-icon" href="../resources/favicon.ico">
 
-  <!-- dependencies -->
-  <script src="../components/three.js/build/three.min.js"></script>
-  <script src="../components/stats.js/build/stats.min.js"></script>
+  <!-- CDN Dependencies -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r75/three.min.js"></script>
+
+  <!-- Offline Dependencies -->
+  <!-- <script src="../components/three.js/build/three.min.js"></script> -->
+  <!-- <script src="../components/stats.js/build/stats.min.js"></script> -->
 
   <!-- Utils -->
-  <!-- TODO: lazy load these plx -->
-  <script defer src="./scripts/utils/StereoEffect.js"></script>
-  <script defer src="./scripts/utils/DeviceOrientationControls.js"></script>
-  <script defer src="./scripts/utils/PointerLockControls.js"></script>
-  <script defer src="./scripts/utils/TapTouchControls.js"></script>
-  <script defer src="./scripts/utils/GeometryUtils.js"></script>
+  <!-- <script defer src="./scripts/utils/StereoEffect.js"></script> -->
+  <!-- <script defer src="./scripts/utils/DeviceOrientationControls.js"></script> -->
+  <!-- <script defer src="./scripts/utils/PointerLockControls.js"></script> -->
+  <!-- <script defer src="./scripts/utils/TapTouchControls.js"></script> -->
+  <!-- <script defer src="./scripts/utils/GeometryUtils.js"></script> -->
 
   <!-- Game scripts -->
-  <script defer src="./scripts/enableControls.js"></script>
-  <script defer src="./scripts/Tile.js"></script>
-  <script defer src="./scripts/GameState.js"></script>
-  <script defer src="./scripts/Board.js"></script>
-  <script defer src="./scripts/game.js"></script>
+  <!-- <script defer src="./scripts/enableControls.js"></script> -->
+  <!-- <script defer src="./scripts/Tile.js"></script> -->
+  <!-- <script defer src="./scripts/GameState.js"></script> -->
+  <!-- <script defer src="./scripts/Board.js"></script> -->
+  <!-- <script defer src="./scripts/game.js"></script> -->
+
+  <script defer src="./single.min.js"></script>
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');ga('create', 'UA-76220891-1', 'auto');ga('send', 'pageview');
+  </script>
 </head>
 <body>
   <div id="blocker">

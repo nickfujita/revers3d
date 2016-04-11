@@ -130,7 +130,7 @@ function Board(gameState, players) {
     }
   }
   this.init();
-}
+};
 
 Board.prototype = Object.create(THREE.Object3D.prototype);
 Board.constructor = Board;
@@ -142,7 +142,7 @@ Board.prototype.light = function(coord, color) {
 
   tile.previousColor = tile.mesh.material.emissive.getHex();
   tile.mesh.material.emissive.setHex(color);
-}
+};
 
 Board.prototype.unlight = function(coord, color) {
   color = color || 0x7fff00;
@@ -150,15 +150,15 @@ Board.prototype.unlight = function(coord, color) {
   var tile = this.gs[coord];
 
   tile.mesh.material.emissive.setHex(tile.previousColor);
-}
+};
 
 Board.prototype.draw = function(scene) {
   scene.add(this);
-}
+};
 
 Board.prototype.erase = function(scene) {
   scene.remove(this);
-}
+};
 
 Board.prototype.init = function() {
   this.light('c1', this.players[0].color);
@@ -167,7 +167,7 @@ Board.prototype.init = function() {
   this.light('d5', this.players[1].color);
 
   this.gs.init();
-}
+};
 
 Board.prototype.capture = function(coord, playerNum, noAnimate) {
   var tile = this.gs[coord];
@@ -220,4 +220,4 @@ Board.prototype.capture = function(coord, playerNum, noAnimate) {
     tile.mesh.currentHex = capColor;
     currentBoard.light(tile.coord, capColor);
   }
-}
+};

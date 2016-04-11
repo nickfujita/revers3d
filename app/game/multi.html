@@ -10,26 +10,34 @@
 
   <script>window.isMultiplayer = true;</script>
 
-  <!-- dependencies -->
-  <script src="../components/three.js/build/three.min.js"></script>
-  <script src="../components/stats.js/build/stats.min.js"></script>
+  <!-- CDN Dependencies -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r75/three.min.js"></script>
+  <script defer src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+
+  <!-- Offline Dependencies -->
+  <!-- <script src="../components/three.js/build/three.min.js"></script> -->
+  <!-- <script src="../components/stats.js/build/stats.min.js"></script> -->
   <!-- <script src="../components/socket.io-client/socket.io.js"></script> -->
-  <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 
   <!-- Utils -->
-  <!-- TODO: lazy load these plx -->
-  <script defer src="./scripts/utils/StereoEffect.js"></script>
-  <script defer src="./scripts/utils/DeviceOrientationControls.js"></script>
-  <script defer src="./scripts/utils/PointerLockControls.js"></script>
-  <script defer src="./scripts/utils/TapTouchControls.js"></script>
-  <script defer src="./scripts/utils/GeometryUtils.js"></script>
+  <!-- <script defer src="./scripts/utils/StereoEffect.js"></script> -->
+  <!-- <script defer src="./scripts/utils/DeviceOrientationControls.js"></script> -->
+  <!-- <script defer src="./scripts/utils/PointerLockControls.js"></script> -->
+  <!-- <script defer src="./scripts/utils/TapTouchControls.js"></script> -->
+  <!-- <script defer src="./scripts/utils/GeometryUtils.js"></script> -->
 
   <!-- Game scripts -->
-  <script defer src="./scripts/enableControls.js"></script>
-  <script defer src="./scripts/Tile.js"></script>
-  <script defer src="./scripts/GameState.js"></script>
-  <script defer src="./scripts/Board.js"></script>
-  <script defer src="./scripts/game.js"></script>
+  <!-- <script defer src="./scripts/enableControls.js"></script> -->
+  <!-- <script defer src="./scripts/Tile.js"></script> -->
+  <!-- <script defer src="./scripts/GameState.js"></script> -->
+  <!-- <script defer src="./scripts/Board.js"></script> -->
+  <!-- <script defer src="./scripts/game.js"></script> -->
+
+  <script defer src="./multi.min.js"></script>
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');ga('create', 'UA-76220891-1', 'auto');ga('send', 'pageview');
+  </script>
 </head>
 <body>
   <div id="blocker">

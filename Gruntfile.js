@@ -7,73 +7,55 @@ module.exports = function(grunt) {
       options: {
         banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
       },
-      scripts: {
-        src: 'app/build/scripts.js',
-        dest: 'app/build/scripts.min.js'
+      single: {
+        src: 'app/build/singleConcat.js',
+        dest: 'app/game/single.min.js'
       },
-      othello: {
-        src: 'app/build/othello.js',
-        dest: 'app/othello/scripts.min.js'
-      },
-      components: {
-        src: 'app/build/components.js',
-        dest: 'app/build/components.min.js'
+      multi: {
+        src: 'app/build/multiConcat.js',
+        dest: 'app/game/multi.min.js'
       }
     },
 
     concat: {
-      scripts: {
+      single: {
         src: [
-          'app/cube/scripts/cube.js',
-          'app/othello/scripts/othello.js',
+          "app/scripts/utils/StereoEffect.js",
+          "app/scripts/utils/DeviceOrientationControls.js",
+          "app/scripts/utils/PointerLockControls.js",
+          "app/scripts/utils/TapTouchControls.js",
+          "app/scripts/utils/GeometryUtils.js",
+          "app/scripts/enableControls.js",
+          "app/scripts/Tile.js",
+          "app/scripts/GameState.js",
+          "app/scripts/Board.js",
+          "app/scripts/game.js",
         ],
-        dest: 'app/build/scripts.js'
+        dest: 'app/build/singleConcat.js'
       },
-      othello: {
+      multi: {
         src: [
-          'app/othello/scripts/**',
+          "app/scripts/utils/StereoEffect.js",
+          "app/scripts/utils/DeviceOrientationControls.js",
+          "app/scripts/utils/PointerLockControls.js",
+          "app/scripts/utils/TapTouchControls.js",
+          "app/scripts/utils/GeometryUtils.js",
+          "app/scripts/enableControls.js",
+          "app/scripts/Tile.js",
+          "app/scripts/GameState.js",
+          "app/scripts/Board.js",
+          "app/scripts/game.js",
         ],
-        dest: 'app/build/othello.js'
+        dest: 'app/build/multiConcat.js'
       },
-      components: {
-        src: ['app/bower_components/three.js/build/three.min.js'],
-        dest: 'app/build/components.js'
-      }
     },
 
     watch: {
-      // scripts: {
-      //   files: [
-      //     'app/**/*.js',
-      //     '!app/build/**'
-      //   ],
-      //   tasks: ['build-scripts'],
-      //   options: {
-      //     // spawn: false,
-      //   },
-      // },
-      othello: {
+      scripts: {
         files: [
-          'app/othello/**',
-          '!app/othello/*.min.js'
-        ],
-        tasks: ['build-othello'],
-        options: {
-          // spawn: false,
-        },
-      },
-      components: {
-        files: [
-          'app/bower_components/**'
+          'app/scripts/**',
         ],
         tasks: ['build'],
-        options: {
-          // spawn: false,
-        },
-      },
-      styles: {
-        files: ['**/*.css'],
-        tasks: [],
         options: {
           // spawn: false,
         },
@@ -87,10 +69,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
 
   // Register tasks
-  grunt.registerTask('default', ['uglify']);
+  grunt.registerTask('default', ['build', 'watch']);
   grunt.registerTask('build', ['concat', 'uglify']);
-  grunt.registerTask('build-othello', ['concat:othello', 'uglify:othello']);
-  grunt.registerTask('build-scripts', ['concat:scripts', 'uglify:scripts']);
-
-
 };
