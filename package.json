@@ -1,15 +1,14 @@
 {
-  "name": "othello",
+  "name": "Revers3D",
   "version": "0.0.0",
   "description": "Play othello/reversi. With a friend. In 3d. In VR.",
   "main": "server.js",
   "scripts": {
-    "postinstall": "bower install",
-    "start": "node server",
-    "test": "test"
+    "postinstall": "bower install && grunt build",
+    "start": "node server"
   },
   "author": "",
-  "repository": "https://github.com/thedeagler/othello.git",
+  "repository": "https://github.com/play3d/revers3d.git",
   "license": "ISC",
   "dependencies": {
     "bower": "^1.7.7",
